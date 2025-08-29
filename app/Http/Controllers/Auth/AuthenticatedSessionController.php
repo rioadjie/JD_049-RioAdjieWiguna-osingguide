@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
         $role = auth()->user()->role;
 
         return match ($role) {
-            'admin' => '/home',
+            'admin' => '/admin/dashboard',
             'guide' => '/home',
             'customer' => '/home',
             default => '/',

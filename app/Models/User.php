@@ -45,4 +45,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function reviewsReceived()
+    {
+        return $this->hasMany(Review::class, 'guide_id');
+    }
+
+    public function guideProfile()
+    {
+        return $this->hasOne(GuideProfile::class, 'user_id');
+    }
+
+    public function bookingsAsGuide()
+    {
+        return $this->hasMany(Booking::class, 'guide_id');
+    }
+
+    public function bookingsAsCustomer()
+    {
+        return $this->hasMany(Booking::class, 'customer_id');
+    }
+
+    public function availabilities()
+    {
+        return $this->hasMany(GuideAvailability::class, 'guide_id');
+    }
 }

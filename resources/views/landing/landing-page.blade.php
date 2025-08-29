@@ -40,7 +40,7 @@
         <div class="header-top">
             <div class="container">
 
-                <a href="tel:081234567890" class="helpline-box">
+                <a href="tel:{{ $contact->no_telp }}" class="helpline-box">
 
                     <div class="icon-box">
                         <ion-icon name="call-outline"></ion-icon>
@@ -49,7 +49,7 @@
                     <div class="wrapper">
                         <p class="helpline-title">For Further Inquires :</p>
 
-                        <p class="helpline-number">081234567890</p>
+                        <p class="helpline-number">{{ $contact->no_telp }}</p>
                     </div>
 
                 </a>
@@ -156,7 +156,7 @@
                         </button>
                         <div class="dropdown-content">
                             <a href="#">My Profile</a>
-                            <a href="#">Booking History</a>
+                            <a href="{{ route('customer.bookings') }}">Booking History</a>
                             <hr>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
@@ -208,10 +208,10 @@
                             <label for="level" class="input-label">Level Guides*</label>
                             <select name="level" id="level" class="input-select">
                                 <option value="" selected hidden>--Select Level--</option>
-                                <option value="junior">Junior</option>
-                                <option value="intermediate">Intermediate
+                                <option value="junior" {{ request('level')=='junior' ?'selected':'' }}>Junior</option>
+                                <option value="intermediate" {{ request('level')=='intermediate' ?'selected':'' }}>Intermediate
                                 </option>
-                                <option value="expert">Expert</option>
+                                <option value="expert" {{ request('level')=='expert' ?'selected':'' }}>Expert</option>
                             </select>
                         </div>
 
@@ -221,8 +221,8 @@
                                 <option value="" selected hidden>-- Select Skill--</option>
                                 @foreach(['Hiking','Photography','Cultural Tour','Food Tour','City
                                 Walk','History','Adventure','Family Tour'] as $skill)
-                                <option value="">
-                                    Skill
+                                <option value="{{ $skill }}" {{ in_array($skill,(array)request('skills'))?'selected':'' }}>
+                                    {{ $skill }}
                                 </option>
                                 @endforeach
                             </select>
@@ -230,13 +230,13 @@
 
                         <div class="input-wrapper">
                             <label for="start-date" class="input-label">Start Tour*</label>
-                            <input type="date" name="start_date" id="start-date" required
+                            <input type="date" name="start_date" id="start-date" value="{{ request('start_date') }}" required
                                 class="input-field">
                         </div>
 
                         <div class="input-wrapper">
                             <label for="end-date" class="input-label">End Tour*</label>
-                            <input type="date" name="end_date" id="end-date" required
+                            <input type="date" name="end_date" id="end-date" value="{{ request('end_date') }}" required
                                 class="input-field">
                         </div>
 
@@ -262,38 +262,42 @@
                     </p>
 
                     <ul class="popular-list">
+                        @foreach($places as $place)
                         <li>
                             <div class="popular-card">
 
                                 <figure class="card-img">
-                                    <img src="{{ asset('assets/img/landing-page/djawatan.jpeg') }}" alt="#"
+                                    <img src="{{ asset('storage/' . $place->image) }}" alt="{{ $place->name_place }}"
                                         loading="lazy">
                                 </figure>
 
                                 <div class="card-content">
 
                                     <div class="card-rating">
+                                        @for($i = 0; $i < $place->rating; $i++)
                                             <ion-icon name="star"></ion-icon>
+                                            @endfor
                                     </div>
 
                                     <p class="card-subtitle">
-                                        Banyuwangi
+                                        {{ $place->location }}
                                     </p>
 
                                     <h3 class="h3 card-title">
                                         <a href="#">
-                                            Djawatan
+                                            {{ $place->name_place }}
                                         </a>
                                     </h3>
 
                                     <p class="card-text">
-                                        Forest of djawatan
+                                        {{ Str::limit($place->content, 25, '...') }}
                                     </p>
 
                                 </div>
 
                             </div>
                         </li>
+                        @endforeach
                     </ul>
 
                     <a href="#">
@@ -320,27 +324,28 @@
                     </p>
 
                     <ul class="package-list">
+                        @foreach($guides as $guide)
                         <li>
                             <div class="package-card">
 
                                 <figure class="card-banner">
-                                    <img src="{{ asset('assets/img/team-1.jpg') }}"
-                                        alt="#" loading="lazy">
+                                    <img src="{{ $guide->guideProfile->photo ? asset('storage/'.$guide->guideProfile->photo) : asset('assets/img/team-1.jpg') }}"
+                                        alt="{{ $guide->name }}" loading="lazy">
                                 </figure>
 
                                 <div class="card-content">
 
-                                    <h3 class="h3 card-title">{Rovita Mei</h3>
+                                    <h3 class="h3 card-title">{{ $guide->name }}</h3>
 
                                     <p class="card-text">
-                                        Bio
+                                        {{ $guide->guideProfile->bio }}
                                     </p>
 
                                     <ul class="card-meta-list">
                                         <li class="card-meta-item">
                                             <div class="meta-box">
                                                 <ion-icon name="people"></ion-icon>
-                                                <p class="text">Intermediate Guide</p>
+                                                <p class="text">{{ ucfirst($guide->guideProfile->level) }} Guide</p>
                                             </div>
                                         </li>
 
@@ -357,20 +362,20 @@
                                 <div class="card-price">
 
                                     <div class="wrapper">
-                                        <p class="reviews">5 reviews</p>
+                                        <p class="reviews">({{ $guide->reviews_count }} reviews)</p>
 
                                         <div class="card-rating">
-                                            <span class="rating-text">4,5/5</span>
+                                            <span class="rating-text">{{ number_format($guide->guideProfile->rating ?? 0, 1) }}/5</span>
                                             <ion-icon name="star"></ion-icon>
                                         </div>
                                     </div>
 
                                     <p class="price">
-                                        Rp. 200.000
+                                        Rp. {{ number_format($guide->guideProfile->daily_rate, 0, ',', '.') }}
                                         <span>/ per day</span>
                                     </p>
 
-                                    <a href="#">
+                                    <a href="{{ route('customer.booking.create', $guide->id) }}">
                                         <button class="btn btn-secondary">Book Now</button>
                                     </a>
 
@@ -378,6 +383,7 @@
 
                             </div>
                         </li>
+                        @endforeach
                     </ul>
 
                     <a href="#">
@@ -402,11 +408,15 @@
                     </p>
 
                     <ul class="gallery-list">
+
+                        @foreach($galleries as $gallery)
                         <li class="gallery-item">
                             <figure class="gallery-image">
-                                <img src="{{  asset('assets/img/landing-page/gallery-1.jpg') }}" alt="Gallery Images">
+                                <img src="{{ asset('storage/' . $gallery->image) }}" alt="Gallery Images">
                             </figure>
                         </li>
+                        @endforeach
+
                     </ul>
 
                     <a href="#">
@@ -434,7 +444,7 @@
                         </p>
                     </div>
 
-                    <a href="https://wa.me/081234567890?text=Hallo%2C%20saya%20ingin%20konsultasi%20perjalanan%20wisata">
+                    <a href="https://wa.me/{{ $contact->no_telp }}?text=Hallo%2C%20saya%20ingin%20konsultasi%20perjalanan%20wisata">
                         <button class="btn btn-secondary">Get Free Consultation Now!</button>
                     </a>
 
@@ -456,11 +466,11 @@
                 <div class="footer-brand">
 
                     <a href="#" class="logo">
-                        <img src="{{ asset('assets/img/landing-page/osingguide-logo.svg') }}" alt="OsingGuide logo">
+                        <img src="{{ asset('storage/' . $about->logo) }}" alt="OsingGuide logo">
                     </a>
 
                     <p class="footer-text">
-                        Osingguide is platform for searh guide in Banyuwangi
+                        {{ $about->description }}
                     </p>
 
                 </div>
@@ -478,19 +488,19 @@
                         <li class="contact-item">
                             <ion-icon name="call-outline"></ion-icon>
 
-                            <a href="tel:081234567890" class="contact-link">081234567890</a>
+                            <a href="tel:{{ $contact->no_telp }}" class="contact-link">{{ $contact->no_telp }}</a>
                         </li>
 
                         <li class="contact-item">
                             <ion-icon name="mail-outline"></ion-icon>
 
-                            <a href="mailto:osingguide.com" class="contact-link">osingguide.com</a>
+                            <a href="mailto:{{ $contact->email }}" class="contact-link">{{ $contact->email }}</a>
                         </li>
 
                         <li class="contact-item">
                             <ion-icon name="location-outline"></ion-icon>
 
-                            <address>Banyuwangi</address>
+                            <address>{{ $contact->address }}</address>
                         </li>
 
                     </ul>
