@@ -1,5 +1,5 @@
 <p align="center"> 
-  <img width="1000" alt="logo Osingguide" src="#">
+  <img width="1000" alt="logo Osingguide" src="https://github.com/user-attachments/assets/b6e6d528-3be8-4d41-8880-65cecc0c5005">
 </p>
 
 # By   : Rio Adjie Wiguna
