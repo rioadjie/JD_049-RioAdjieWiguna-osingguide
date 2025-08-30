@@ -51,18 +51,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect($this->redirectTo());
-    }
-
-    protected function redirectTo(): string
-    {
-        $role = auth()->user()->role;
-
-        return match ($role) {
-            'admin' => '/admin/dashboard',
-            'guide' => '/guide/dashboard',
-            'customer' => '/customer/dashboard',
-            default => '/',
-        };
+        return redirect()->route('verification.notice');
     }
 }
