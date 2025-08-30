@@ -262,7 +262,7 @@
                             <section>
                                 <h3>Skills</h3>
                                 @foreach(['Hiking','Photography','Cultural Tour','Food Tour','City
-                                Walk','History','Adventure','Family Tour'] as $skill)
+                                Walk','History','Adventure','Family Tour', 'Fasilitator Outbound', 'Trainer Outbound'] as $skill)
                                 <label>
                                     <input type="checkbox" value="{{ $skill }}" class="filter-skill" {{ in_array($skill,(array)request('skills'))
                                         ? 'checked' : '' }}>
@@ -305,8 +305,8 @@
                                             Rp. {{ number_format($guide->guideProfile->daily_rate, 0, ',', '.') }} / per
                                             day
                                         </p>
-                                        <a href="{{ route('customer.booking.create', $guide->id) }}">
-                                            <button type="button" class="btn-book-now">Book Now</button>
+                                        <a href="{{ route('customer.show', $guide->id) }}">
+                                            <button type="button" class="btn-book-now">Lihat Detail</button>
                                         </a>
                                     </div>
                                 </div>

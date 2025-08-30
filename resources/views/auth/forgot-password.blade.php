@@ -21,7 +21,7 @@
                 <div class="card-header">
                     <div class="d-flex">
                         <div class="icon icon-shape bg-primary shadow text-center border-radius-md">
-                            <i class="ni ni-circle-08 text-white text-lg opacity-10" aria-hidden="true"></i>
+                            <i class="bi bi-person-circle text-white text-lg opacity-10" aria-hidden="true"></i>
                         </div>
                         <div class="ms-3">
                             <h5 class="mb-0">Can't log in?</h5>

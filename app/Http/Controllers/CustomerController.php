@@ -95,4 +95,13 @@ class CustomerController extends Controller
 
         return view('landing.guide-list', compact('guides'));
     }
+
+    // Function untuk melihat detail guide
+    public function show($id)
+    {
+        $guide = User::with(['guideProfile', 'availabilities']) // kalau pakai spatie role
+            ->findOrFail($id);
+
+        return view('landing.detail-guide', compact('guide'));
+    }
 }

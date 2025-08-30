@@ -68,7 +68,7 @@
                                 <div class="mb-3">
                                     <label>Skill / Keahlian</label>
                                     <select name="skills[]" class="form-control" multiple required>
-                                        @foreach (['Hiking', 'Photography', 'Cultural Tour', 'Food Tour', 'City Walk', 'History', 'Adventure', 'Family Tour'] as $skill)
+                                        @foreach (['Hiking', 'Photography', 'Cultural Tour', 'Food Tour', 'City Walk', 'History', 'Adventure', 'Family Tour', 'Fasilitator Outbound', 'Trainer Outbound'] as $skill)
                                             <option value="{{ $skill }}"
                                                 {{ in_array($skill, $profile->skills ?? []) ? 'selected' : '' }}>
                                                 {{ $skill }}

@@ -12,26 +12,16 @@ use App\Http\Controllers\GuideProfileController;
 use App\Http\Controllers\GuideReviewController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
 // Landing Page
 Route::get('/', [LandingPageController::class, 'index'])->name('landing-page');
 Route::get('/list-guides', [CustomerController::class, 'guides'])->name('customer.list-guides');
 
 // Admin Dashboard
-Route::prefix('admin')->name('admin.')->middleware('auth', 'role:admin')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     // Booking Order
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
@@ -62,7 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth', 'role:admin')->group(
 });
 
 // Guide Dashboard
-Route::prefix('guide')->name('guide.')->middleware(['auth', 'role:guide'])->group(function () {
+Route::prefix('guide')->name('guide.')->middleware(['auth', 'verified', 'role:guide'])->group(function () {
     Route::get('/dashboard', [GuideController::class, 'dashboard'])->name('dashboard');
     Route::get('/bookings', [GuideController::class, 'bookings'])->name('bookings');
     Route::post('/bookings/{id}complete', [GuideController::class, 'markAsCompleted'])->name('booking.complete');
@@ -76,13 +66,14 @@ Route::prefix('guide')->name('guide.')->middleware(['auth', 'role:guide'])->grou
 });
 
 // Customer
-Route::prefix('customer')->name('customer.')->middleware(['auth', 'role:customer'])->group(function () {
+Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/detail/{id}', [CustomerController::class, 'show'])->name('show');
     Route::get('/bookings', [BookingController::class, 'bookings'])->name('bookings');
-    Route::get('/bookings/create/{guideId}', [BookingController::class, 'create'])->name('booking.create');
-    Route::post('/bookings', [BookingController::class, 'store'])->name('booking.store');
-    Route::get('/reviews/create/{bookingId}', [ReviewController::class, 'create'])->name('review.create');
-    Route::post('/reviews', [ReviewController::class, 'store'])->name('review.store');
+    Route::get('/bookings/create/{guideId}', [BookingController::class, 'create'])->middleware(['auth', 'role:customer'])->name('booking.create');
+    Route::post('/bookings', [BookingController::class, 'store'])->middleware(['auth', 'role:customer'])->name('booking.store');
+    Route::get('/reviews/create/{bookingId}', [ReviewController::class, 'create'])->middleware(['auth', 'role:customer'])->name('review.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->middleware(['auth', 'role:customer'])->name('review.store');
 });
 
 require __DIR__ . '/auth.php';
