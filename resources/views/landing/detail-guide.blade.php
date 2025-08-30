@@ -245,8 +245,13 @@
 
                             <!-- Harga -->
                             <div class="guide-price">
-                                Rp. {{ number_format($guide->guideProfile->daily_rate, 0, ',', '.') }} <span>/
-                                    day</span>
+                                @php
+                                $dailyRate = $guide->guideProfile->daily_rate;
+                                $platformFeePercentage = \App\Models\Setting::getValue('platform_fee_value') ?? 15;
+                                $platformFee = ($dailyRate * $platformFeePercentage) / 100;
+                                $totalDailyRate = $dailyRate + $platformFee;
+                                @endphp
+                                Rp. {{ number_format($totalDailyRate, 0, ',', '.') }} <span>/day</span>
                             </div>
 
                             <!-- Tombol -->

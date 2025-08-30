@@ -371,7 +371,13 @@
                                     </div>
 
                                     <p class="price">
-                                        Rp. {{ number_format($guide->guideProfile->daily_rate, 0, ',', '.') }}
+                                        @php
+                                        $dailyRate = $guide->guideProfile->daily_rate;
+                                        $platformFeePercentage = \App\Models\Setting::getValue('platform_fee_value') ?? 15;
+                                        $platformFee = ($dailyRate * $platformFeePercentage) / 100;
+                                        $totalDailyRate = $dailyRate + $platformFee;
+                                        @endphp
+                                        Rp. {{ number_format($totalDailyRate, 0, ',', '.') }}
                                         <span>/ per day</span>
                                     </p>
 

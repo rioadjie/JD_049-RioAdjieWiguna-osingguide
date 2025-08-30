@@ -51,8 +51,8 @@ class BookingController extends Controller
     {
         $request->validate([
             'guide_id' => 'required|exists:users,id,role,guide',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
+            'start_time' => 'required|date|after:now',
+            'end_time' => 'required|date|after:now',
             'number_of_travelers' => 'required|integer|min:1',
             'destination' => 'required|string',
             'notes' => 'nullable|string',
@@ -95,15 +95,34 @@ class BookingController extends Controller
         $allDatesAvailable = $availableDatesCount === count($datesInRange);
 
         if ($hasBookingConflict || !$allDatesAvailable) {
+            $errorMessage = '';
+
+            if ($hasBookingConflict) {
+                $errorMessage = 'Guide sudah memiliki booking lain pada tanggal yang dipilih. ';
+            }
+
+            if (!$allDatesAvailable) {
+                $errorMessage .= 'Guide belum menandai ketersediaan untuk semua tanggal yang dipilih. ';
+            }
+
+            $errorMessage .= 'Silakan pilih tanggal lain atau hubungi admin untuk konfirmasi ketersediaan.';
+
             return back()->withErrors([
-                'start_time' => 'Guide tidak tersedia pada tanggal yang dipilih. Harap pilih tanggal yang sudah ditandai tersedia.'
+                'start_time' => $errorMessage
             ]);
         }
 
         // Hitung harga
         $start = Carbon::parse($request->start_time);
         $end = Carbon::parse($request->end_time);
-        $totalDays = $start->diffInDays($end) + 1;
+
+        // For same-day bookings, count as 1 day
+        // For multi-day bookings, count the actual difference
+        if ($start->isSameDay($end)) {
+            $totalDays = 1;
+        } else {
+            $totalDays = $start->diffInDays($end);
+        }
 
         $subTotal = $profile->daily_rate * $totalDays;
         $feeType = Setting::getValue('platform_fee_type') ?? 'percentage';

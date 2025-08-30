@@ -302,8 +302,13 @@
                                         <p class="card-subtitle">{{ ucfirst($guide->guideProfile->level) }}</p>
                                         <h3 class="h3 card-title">{{ $guide->name }}</h3>
                                         <p class="card-text">
-                                            Rp. {{ number_format($guide->guideProfile->daily_rate, 0, ',', '.') }} / per
-                                            day
+                                            @php
+                                                $dailyRate = $guide->guideProfile->daily_rate;
+                                                $platformFeePercentage = \App\Models\Setting::getValue('platform_fee_value') ?? 15;
+                                                $platformFee = ($dailyRate * $platformFeePercentage) / 100;
+                                                $totalDailyRate = $dailyRate + $platformFee;
+                                            @endphp
+                                            Rp. {{ number_format($totalDailyRate, 0, ',', '.') }} / per day
                                         </p>
                                         <a href="{{ route('customer.show', $guide->id) }}">
                                             <button type="button" class="btn-book-now">Lihat Detail</button>
