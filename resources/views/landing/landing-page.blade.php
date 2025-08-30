@@ -300,7 +300,7 @@
                         @endforeach
                     </ul>
 
-                    <a href="#">
+                    <a href="{{ route('customer.list-places') }}">
                         <button class="btn btn-primary">More Place Destination</button>
                     </a>
 
@@ -419,7 +419,7 @@
 
                     </ul>
 
-                    <a href="#">
+                    <a href="{{ route('customer.list-gallery') }}">
                         <button class="btn btn-primary">More Photo's</button>
                     </a>
 

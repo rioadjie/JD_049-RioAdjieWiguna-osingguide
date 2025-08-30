@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OsingGuide - Make Your Trip Easier</title>
+    <title>OsingGuide - Places to Visit</title>
 
     <!--
     - favicon
@@ -18,6 +18,73 @@
     <link rel="stylesheet" href="{{ asset('assets/css/landing-page.css') }}">
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Search Box Styles -->
+    <style>
+        /* Search Box Styles */
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .search-box input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fff;
+        }
+
+        .search-box input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+        }
+
+        .search-box input[type="text"]::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .search-box .btn-search {
+            padding: 10px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .search-box .btn-search:hover {
+            background-color: var(--secondary);
+            transform: translateY(-1px);
+        }
+
+        .search-box .btn-search:active {
+            transform: translateY(0);
+        }
+
+        /* Media query untuk search box di mobile */
+        @media (max-width: 480px) {
+            .search-box {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .search-box input[type="text"],
+            .search-box .btn-search {
+                width: 100%;
+            }
+        }
+    </style>
 
     <!--
     - google font link
@@ -125,11 +192,13 @@
                         </li>
 
                         <li>
-                            <a href="{{ route('customer.list-places') }}" class="navbar-link" data-nav-link>place to visit</a>
+                            <a href="{{ route('customer.list-places') }}" class="navbar-link" data-nav-link>place to
+                                visit</a>
                         </li>
 
                         <li>
-                            <a href="{{ route('customer.list-guides') }}" class="navbar-link" data-nav-link>recomendation</a>
+                            <a href="{{ route('customer.list-guides') }}" class="navbar-link"
+                                data-nav-link>recomendation</a>
                         </li>
 
                         <li>
@@ -177,57 +246,35 @@
     <main>
         <article>
 
-            <!-- Carousel Section -->
-            {{-- <div class="swiper heroSwiper">
-                <div class="swiper-wrapper">
-
-                    <div class="swiper-slide">
-                        <img src="{{ asset('assets/img/landing-page/ijen-photo.jpeg') }}" alt="Kawah Ijen" />
-                    </div>
-
-                    <div class="swiper-slide">
-                        <img src="{{ asset('assets/img/landing-page/pulau-merah.jpeg') }}" alt="Pulau Merah" />
-                    </div>
-
-                    <div class="swiper-slide">
-                        <img src="{{ asset('assets/img/landing-page/djawatan.jpeg') }}" alt="Djawatan" />
-                    </div>
-
-                </div>
-
-                <!-- Pagination & Navigation -->
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div> --}}
-
             <!--
-            - #List Guide
+            - #List Places
             -->
 
-            <section class="package" id="guide">
+            <section class="package" id="places">
                 <div class="container" style="margin-top: 80px">
-                    <p class="section-subtitle">Check Our Guide to Help Your Travel</p>
-                    <h2 class="h2 section-title">List Guide</h2>
-                    <p class="section-text">List of our guide in OsingGuide.</p>
+                    <p class="section-subtitle">Discover Amazing Destinations</p>
+                    <h2 class="h2 section-title">Places to Visit</h2>
+                    <p class="section-text">Explore the beautiful destinations in Banyuwangi.</p>
 
                     <!-- Top Filter -->
                     <div class="top-filters">
-                        <button class="filter-btn {{ request('level')=='all' || !request('level') ? 'active':'' }}"
-                            data-sort="all">All</button>
-                        <button class="filter-btn {{ request('level')=='junior' ? 'active':'' }}" data-sort="junior">Junior Guide</button>
-                        <button class="filter-btn {{ request('level')=='intermediate' ? 'active':'' }}"
-                            data-sort="intermediate">Intermediate Guide</button>
-                        <button class="filter-btn {{ request('level')=='expert' ? 'active':'' }}" data-sort="expert">Expert Guide</button>
+                        <button class="filter-btn {{ request('rating')=='all' || !request('rating') ? 'active':'' }}"
+                            data-sort="all">All Places</button>
+                        <button class="filter-btn {{ request('rating')=='5' ? 'active':'' }}" data-sort="5">5+
+                            Stars</button>
+                        <button class="filter-btn {{ request('rating')=='4' ? 'active':'' }}" data-sort="4">4+
+                            Stars</button>
+                        <button class="filter-btn {{ request('rating')=='3' ? 'active':'' }}" data-sort="3">3+
+                            Stars</button>
 
-                        <select id="price-sort">
-                            <option value="">Sort by Price</option>
-                            <option value="low">Lowest Price</option>
-                            <option value="high">Highest Price</option>
+                        <select id="rating-sort">
+                            <option value="">Sort by Rating</option>
+                            <option value="high">Highest Rating</option>
+                            <option value="low">Lowest Rating</option>
                         </select>
                     </div>
 
-                    <div class="guide-page">
+                    <div class="place-page">
                         <!-- Tombol untuk membuka sidebar (tampil di mobile) -->
                         <button class="open-sidebar-btn">☰ Filters</button>
 
@@ -236,37 +283,21 @@
                             <button class="close-sidebar-btn">&times;</button> <!-- Tombol close -->
 
                             <section>
-                                <h3>Availbility Guides</h3>
-                                <div class="date-range">
-                                    <label for="start-date">From</label>
-                                    <input type="date" id="start-date" value="{{ request('start_date') }}">
-
-                                    <label for="end-date">To</label>
-                                    <input type="date" id="end-date" value="{{ request('end_date') }}">
-
-                                    <button type="button" class="btn-apply-date" id="apply-date-btn">Apply Date</button>
+                                <h3>Search Places</h3>
+                                <div class="search-box">
+                                    <input type="text" id="search-input" placeholder="Search by name, location..."
+                                        value="{{ request('search') }}">
+                                    <button type="button" class="btn-search" id="search-btn">Search</button>
                                 </div>
                             </section>
 
                             <section>
-                                <h3>Language</h3>
-                                @foreach(['Indonesia','English','Mandarin','Japanese','Korean','Arabic'] as $lang)
+                                <h3>Rating Filter</h3>
+                                @foreach([5,4,3,2,1] as $rating)
                                 <label>
-                                    <input type="checkbox" value="{{ $lang }}" class="filter-language" {{
-                                        in_array($lang,(array)request('languages')) ? 'checked' : '' }}>
-                                    <span class="checkmark"></span> {{ $lang }}
-                                </label>
-                                @endforeach
-                            </section>
-
-                            <section>
-                                <h3>Skills</h3>
-                                @foreach(['Hiking','Photography','Cultural Tour','Food Tour','City
-                                Walk','History','Adventure','Family Tour', 'Fasilitator Outbound', 'Trainer Outbound'] as $skill)
-                                <label>
-                                    <input type="checkbox" value="{{ $skill }}" class="filter-skill" {{ in_array($skill,(array)request('skills'))
-                                        ? 'checked' : '' }}>
-                                    <span class="checkmark"></span> {{ $skill }}
+                                    <input type="checkbox" value="{{ $rating }}" class="filter-rating" {{
+                                        in_array($rating,(array)request('rating')) ? 'checked' : '' }}>
+                                    <span class="checkmark"></span> {{ $rating }}+ Stars
                                 </label>
                                 @endforeach
                             </section>
@@ -277,41 +308,36 @@
                             </section>
                         </aside>
 
-
                         <!-- Konten Card -->
-                        <main class="guide-list-wrapper">
-                            <div class="cards-grid" id="guide-list">
-                                @forelse($guides as $guide)
-                                <div class="popular-card" data-category="{{ strtolower($guide->guideProfile->level) }}"
-                                    data-price="{{ $guide->guideProfile->daily_rate }}"
-                                    data-language="{{ implode(',', $guide->guideProfile->languages) }}"
-                                    data-skill="{{ implode(',', $guide->guideProfile->skills) }}"
-                                    data-availability='@json($guide->availabilities->where("status","available")->pluck("date")->map->format("Y-m-d"))'>
+                        <main class="place-list-wrapper">
+                            <div class="cards-grid" id="place-list">
+                                @forelse($places as $place)
+                                <div class="popular-card" data-rating="{{ $place->rating }}"
+                                    data-name="{{ strtolower($place->name_place) }}"
+                                    data-location="{{ strtolower($place->location) }}"
+                                    data-description="{{ strtolower($place->description) }}">
                                     <figure class="card-img">
-                                        <img src="{{ $guide->guideProfile->photo ? asset('storage/'.$guide->guideProfile->photo) : asset('assets/img/team-1.jpg') }}"
-                                            alt="{{ $guide->name }}" loading="lazy">
+                                        <img src="{{ $place->image ? asset('storage/'.$place->image) : asset('assets/img/landing-page/ijen-photo.jpeg') }}"
+                                            alt="{{ $place->name_place }}" loading="lazy">
                                     </figure>
 
                                     <div class="card-content">
                                         <div class="card-rating">
-                                            <span class="rating-text">{{ number_format($guide->guideProfile->rating ??
-                                                0, 1)
-                                                }}/5</span>
+                                            <span class="rating-text">{{ $place->rating }}/5</span>
                                             <ion-icon name="star"></ion-icon>
                                         </div>
-                                        <p class="card-subtitle">{{ ucfirst($guide->guideProfile->level) }}</p>
-                                        <h3 class="h3 card-title">{{ $guide->name }}</h3>
+                                        <p class="card-subtitle">{{ $place->location }}</p>
+                                        <h3 class="h3 card-title">{{ $place->name_place }}</h3>
                                         <p class="card-text">
-                                            Rp. {{ number_format($guide->guideProfile->daily_rate, 0, ',', '.') }} / per
-                                            day
+                                            {{ Str::limit($place->description, 100) }}
                                         </p>
-                                        <a href="{{ route('customer.show', $guide->id) }}">
+                                        <a href="{{ route('customer.place-detail', $place->id) }}">
                                             <button type="button" class="btn-book-now">Lihat Detail</button>
                                         </a>
                                     </div>
                                 </div>
                                 @empty
-                                <p class="section-text">No guides available for your filters.</p>
+                                <p class="section-text">No places available for your filters.</p>
                                 @endforelse
                             </div>
                         </main>
@@ -461,24 +487,7 @@
     <script src="{{ asset('assets/js/landing-page.js') }}"></script>
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <!-- Init Hero Swiper -->
-    <script>
-        var heroSwiper = new Swiper(".heroSwiper", {
-        loop: true,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-        },
-        navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-        },
-    });
-    </script>
+
     {{-- filter js --}}
     <script>
         const sidebar = document.getElementById("sidebar");
@@ -498,65 +507,54 @@
         document.addEventListener("DOMContentLoaded", function () {
             const cards = document.querySelectorAll(".popular-card");
             const filterBtns = document.querySelectorAll(".filter-btn");
-            const priceSort = document.getElementById("price-sort");
-            const applyDateBtn = document.getElementById("apply-date-btn");
+            const ratingSort = document.getElementById("rating-sort");
+            const searchBtn = document.getElementById("search-btn");
             const resetBtn = document.getElementById("reset-filters-btn");
 
             function applyFilters() {
                 const activeCategory = document.querySelector(".filter-btn.active")?.dataset.sort || "all";
-                const selectedLanguages = Array.from(document.querySelectorAll(".filter-language:checked")).map(el => el.value);
-                const selectedSkills = Array.from(document.querySelectorAll(".filter-skill:checked")).map(el => el.value);
-                const startDate = document.getElementById("start-date")?.value;
-                const endDate = document.getElementById("end-date")?.value;
+                const selectedRatings = Array.from(document.querySelectorAll(".filter-rating:checked")).map(el => parseInt(el.value));
+                const searchTerm = document.getElementById("search-input")?.value.toLowerCase();
 
                 cards.forEach(card => {
-                    const category = card.dataset.category;
-                    const price = parseInt(card.dataset.price);
-                    const languages = card.dataset.language ? card.dataset.language.split(",") : [];
-                    const skills = card.dataset.skill ? card.dataset.skill.split(",") : [];
-                    const availabilities = card.dataset.availability ? JSON.parse(card.dataset.availability) : [];
+                    const rating = parseFloat(card.dataset.rating);
+                    const name = card.dataset.name;
+                    const location = card.dataset.location;
+                    const description = card.dataset.description;
 
                     let visible = true;
 
                     // Filter kategori
-                    if (activeCategory !== "all" && category !== activeCategory) visible = false;
-
-                    // Filter bahasa
-                    if (selectedLanguages.length) {
-                        const matchLanguage = selectedLanguages.some(lang => languages.includes(lang));
-                        if (!matchLanguage) visible = false;
+                    if (activeCategory !== "all") {
+                        const minRating = parseInt(activeCategory);
+                        if (rating < minRating) visible = false;
                     }
 
-                    // Filter skill
-                    if (selectedSkills.length) {
-                        const matchSkill = selectedSkills.some(skill => skills.includes(skill));
-                        if (!matchSkill) visible = false;
+                    // Filter rating
+                    if (selectedRatings.length) {
+                        const matchRating = selectedRatings.some(minRating => rating >= minRating);
+                        if (!matchRating) visible = false;
                     }
 
-                    // Filter tanggal (availability)
-                    if (startDate || endDate) {
-                        let matchDate = false;
-                        if (availabilities.length) {
-                            matchDate = availabilities.some(date => {
-                                if (startDate && date < startDate) return false;
-                                if (endDate && date > endDate) return false;
-                                return true;
-                            });
-                        }
-                        if (!matchDate) visible = false;
+                    // Filter search
+                    if (searchTerm) {
+                        const matchSearch = name.includes(searchTerm) ||
+                                          location.includes(searchTerm) ||
+                                          description.includes(searchTerm);
+                        if (!matchSearch) visible = false;
                     }
 
                     card.style.display = visible ? "block" : "none";
                 });
 
-                // Sort harga
-                if (priceSort.value) {
+                // Sort rating
+                if (ratingSort.value) {
                     const sortedCards = Array.from(cards).sort((a, b) => {
-                        const priceA = parseInt(a.dataset.price);
-                        const priceB = parseInt(b.dataset.price);
-                        return priceSort.value === "low" ? priceA - priceB : priceB - priceA;
+                        const ratingA = parseFloat(a.dataset.rating);
+                        const ratingB = parseFloat(b.dataset.rating);
+                        return ratingSort.value === "high" ? ratingB - ratingA : ratingA - ratingB;
                     });
-                    const container = document.getElementById("guide-list");
+                    const container = document.getElementById("place-list");
                     container.innerHTML = "";
                     sortedCards.forEach(card => container.appendChild(card));
                 }
@@ -571,9 +569,16 @@
                 });
             });
 
-            document.querySelectorAll(".filter-language, .filter-skill").forEach(el => el.addEventListener("change", applyFilters));
-            priceSort.addEventListener("change", applyFilters);
-            applyDateBtn?.addEventListener("click", applyFilters);
+            document.querySelectorAll(".filter-rating").forEach(el => el.addEventListener("change", applyFilters));
+            ratingSort.addEventListener("change", applyFilters);
+            searchBtn?.addEventListener("click", applyFilters);
+
+            // Search on Enter key
+            document.getElementById("search-input")?.addEventListener("keypress", function(e) {
+                if (e.key === "Enter") {
+                    applyFilters();
+                }
+            });
 
             // Reset All Filters
             resetBtn?.addEventListener("click", () => {
@@ -583,22 +588,25 @@
                 if (defaultBtn) defaultBtn.classList.add("active");
 
                 // Reset checkboxes
-                document.querySelectorAll(".filter-language, .filter-skill").forEach(el => el.checked = false);
+                document.querySelectorAll(".filter-rating").forEach(el => el.checked = false);
 
-                // Reset tanggal
-                const startInput = document.getElementById("start-date");
-                const endInput = document.getElementById("end-date");
-                if (startInput) startInput.value = "";
-                if (endInput) endInput.value = "";
+                // Reset search
+                const searchInput = document.getElementById("search-input");
+                if (searchInput) searchInput.value = "";
 
-                // Reset sort harga
-                if (priceSort) priceSort.value = "";
+                // Reset sort rating
+                if (ratingSort) ratingSort.value = "";
 
                 applyFilters();
             });
 
             applyFilters(); // apply default on load
         });
+
+        function showPlaceDetail(placeId) {
+            // You can implement a modal or redirect to detail page
+            alert('Place detail for ID: ' + placeId + ' - This can be implemented as a modal or detail page');
+        }
     </script>
 
     <!--
@@ -606,6 +614,76 @@
   -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <style>
+        .place-page {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 250px;
+            /* desktop */
+        }
+
+        .place-list-wrapper {
+            flex: 1;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .popular-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 10px;
+        }
+
+        .card-content .btn-book-now {
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .card-content .btn-book-now:hover {
+            background-color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .place-page {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    </style>
 
 </body>
 

@@ -7,8 +7,8 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-5 text-center mx-auto">
-                <h1 class="text-white mb-2 mt-5">Welcome!</h1>
-                <p class="text-lead text-white">Create your account to get started.</p>
+                <h1 class="text-white mb-2 mt-5">Welcome Admin!</h1>
+                <p class="text-lead text-white">Create your account to manage our platform.</p>
             </div>
         </div>
     </div>
@@ -26,8 +26,8 @@
                 <div class="card-body">
                     <form role="form" method="POST" action="{{ route('register') }}">
                         @csrf
-                        {{-- Role hidden (otomatis customer) --}}
-                        <input type="hidden" name="role" value="customer">
+                        {{-- Role hidden --}}
+                        <input type="hidden" name="role" value="admin">
 
                         {{-- Name --}}
                         <div class="mb-3">

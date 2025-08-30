@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 // Landing Page
 Route::get('/', [LandingPageController::class, 'index'])->name('landing-page');
 Route::get('/list-guides', [CustomerController::class, 'guides'])->name('customer.list-guides');
+Route::get('/list-places', [CustomerController::class, 'places'])->name('customer.list-places');
+Route::get('/place/{id}', [CustomerController::class, 'placeDetail'])->name('customer.place-detail');
+Route::get('/list-gallery', [CustomerController::class, 'gallery'])->name('customer.list-gallery');
 
 // Admin Dashboard
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:admin'])->group(function () {

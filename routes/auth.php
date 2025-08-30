@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
                 ->name('register');
+    // form register Guide
+    Route::get('/register/guide', [RegisteredUserController::class, 'showGuideRegisterForm'])->name('register.guide');
+    // form register Admin
+    Route::get('~backdoor/admin/registration', [RegisteredUserController::class, 'showAdminRegisterForm'])->name('register.admin');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
