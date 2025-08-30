@@ -27,6 +27,7 @@ class GuideProfileController extends Controller
             'daily_rate' => 'required|numeric|min:100000',
             'max_travelers' => 'required|integer|min:1|max:20',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // opsional, maks 2MB
+            'cv' => 'nullable|mimes:pdf|max:5120', // opsional, maks 5MB
         ]);
 
         $guide = auth()->user();
@@ -41,8 +42,8 @@ class GuideProfileController extends Controller
             'phone' => $phone,
         ]);
 
-        // Ambil data form untuk profile, kecuali foto dan data user
-        $profileData = $request->except(['photo', 'name', 'phone']);
+        // Ambil data form untuk profile, kecuali foto, cv dan data user
+        $profileData = $request->except(['photo', 'cv', 'name', 'phone']);
 
         // Handle upload foto
         if ($request->hasFile('photo')) {
@@ -53,6 +54,17 @@ class GuideProfileController extends Controller
 
             // Simpan foto baru
             $profileData['photo'] = $request->file('photo')->store('guide_photos', 'public');
+        }
+
+        // Handle upload CV
+        if ($request->hasFile('cv')) {
+            // Hapus CV lama jika ada
+            if ($profile->cv && Storage::exists('public/' . $profile->cv)) {
+                Storage::delete('public/' . $profile->cv);
+            }
+
+            // Simpan CV baru
+            $profileData['cv'] = $request->file('cv')->store('guide_cvs', 'public');
         }
 
         // Simpan data profile

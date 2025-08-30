@@ -257,15 +257,35 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="bio" class="form-control-label">Bio (Tentang Saya)</label>
-                                        <textarea name="bio" class="form-control @error('bio') is-invalid @enderror"
-                                            rows="4"
-                                            placeholder="Ceritakan tentang diri Anda...">{{ old('bio', $profile->bio) }}</textarea>
-                                        @error('bio')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                                                         <div class="form-group">
+                                         <label for="bio" class="form-control-label">Bio (Tentang Saya)</label>
+                                         <textarea name="bio" class="form-control @error('bio') is-invalid @enderror"
+                                             rows="4"
+                                             placeholder="Ceritakan tentang diri Anda...">{{ old('bio', $profile->bio) }}</textarea>
+                                         @error('bio')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                         @enderror
+                                     </div>
+
+                                     <div class="form-group">
+                                         <label for="cv" class="form-control-label">CV/Resume (PDF)</label>
+                                         <div class="d-flex align-items-center">
+                                             @if ($profile->cv)
+                                                 <div class="me-3">
+                                                     <a href="{{ asset('storage/' . $profile->cv) }}" target="_blank" class="btn btn-sm btn-info">
+                                                         <i class="fas fa-file-pdf me-1"></i>Lihat CV
+                                                     </a>
+                                                 </div>
+                                             @endif
+                                             <input type="file" name="cv" id="cv-input"
+                                                 class="form-control @error('cv') is-invalid @enderror"
+                                                 accept=".pdf" style="flex: 1;">
+                                         </div>
+                                         <small class="form-text text-muted">Upload CV dalam format PDF (maksimal 5MB)</small>
+                                         @error('cv')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                         @enderror
+                                     </div>
                                 </div>
                             </div>
 
@@ -502,64 +522,156 @@
     .mt-1 {
         margin-top: 0.25rem !important;
     }
+
+    /* CV upload styling */
+    .btn-info {
+        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%);
+        border: 0;
+        border-radius: 0.375rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.15s ease;
+    }
+
+    .btn-info:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        color: white;
+    }
+
+    .d-flex {
+        display: flex !important;
+    }
+
+    .align-items-center {
+        align-items: center !important;
+    }
+
+    .me-3 {
+        margin-right: 1rem !important;
+    }
 </style>
 @endpush
 
 @push('js')
 <script>
-    // Auto-hide alerts after 5 seconds
     document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide alerts after 5 seconds
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             setTimeout(() => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 300);
             }, 5000);
         });
 
         // Image preview functionality
         const photoInput = document.getElementById('photo-input');
-        const avatarContainer = document.querySelector('.avatar img, .avatar div');
-
-        photoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Update the avatar image
-                    const imgElement = document.querySelector('.avatar img');
-                    if (imgElement) {
-                        imgElement.src = e.target.result;
-                    } else {
-                        // If no image exists, create one
-                        const avatarDiv = document.querySelector('.avatar div');
-                        if (avatarDiv) {
-                            avatarDiv.innerHTML = `<img src="${e.target.result}" alt="Profile Photo" class="w-100 border-radius-lg shadow-sm">`;
-                        }
+        if (photoInput) {
+            photoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select an image file');
+                        return;
                     }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+
+                    // Validate file size (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('File size must be less than 2MB');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Update the avatar image
+                        const imgElement = document.querySelector('.avatar img');
+                        if (imgElement) {
+                            imgElement.src = e.target.result;
+                        } else {
+                            // If no image exists, create one
+                            const avatarDiv = document.querySelector('.avatar div');
+                            if (avatarDiv) {
+                                avatarDiv.innerHTML = `<img src="${e.target.result}" alt="Profile Photo" class="w-100 border-radius-lg shadow-sm">`;
+                            }
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
         // Real-time name update in header
         const nameInput = document.querySelector('input[name="name"]');
         const headerName = document.querySelector('.col h4');
 
-        nameInput.addEventListener('input', function(e) {
-            headerName.textContent = e.target.value;
-        });
+        if (nameInput && headerName) {
+            nameInput.addEventListener('input', function(e) {
+                headerName.textContent = e.target.value;
+            });
+        }
 
-        // Auto-hide alerts
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 300);
-            }, 5000);
+        // CV file input validation
+        const cvInput = document.getElementById('cv-input');
+        if (cvInput) {
+            cvInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    if (file.type !== 'application/pdf') {
+                        alert('Please select a PDF file');
+                        this.value = '';
+                        return;
+                    }
+
+                    // Validate file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        this.value = '';
+                        return;
+                    }
+                }
+            });
+        }
+
+        // Form validation
+        const form = document.querySelector('form[action*="profile"]');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields');
+                }
+            });
+        }
+
+        // Remove invalid class on input
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                }
+            });
         });
     });
-
-
 </script>
 @endpush

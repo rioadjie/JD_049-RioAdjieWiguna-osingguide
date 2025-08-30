@@ -19,6 +19,7 @@ class GuideProfile extends Model
         'level', // junior, intermediate, expert
         'status', // active, inactive (ganti availability jadi status)
         'photo',
+        'cv',
     ];
 
     protected $casts = [

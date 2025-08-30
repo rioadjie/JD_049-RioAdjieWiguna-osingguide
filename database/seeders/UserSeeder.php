@@ -16,26 +16,26 @@ class UserSeeder extends Seeder
         // Admin
         User::create([
             'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('admin123'), // ganti dengan password aman
+            'email' => 'admin@osingguide.com',
+            'password' => Hash::make('admin123!@#'),
             'role' => 'admin',
             'phone' => '+6281234567890'
         ]);
 
         // Guide
         User::create([
-            'name' => 'Rovita Mei',
-            'email' => 'rovita@gmail.com',
-            'password' => Hash::make('12345678'),
+            'name' => 'Rio',
+            'email' => 'rio@gmail.com',
+            'password' => Hash::make('password'),
             'role' => 'guide',
             'phone' => '+6281234567891'
         ]);
 
         // Customer
         User::create([
-            'name' => 'Rio Adjie',
-            'email' => 'rio@gmail.com',
-            'password' => Hash::make('12345678'),
+            'name' => 'Cutomer',
+            'email' => 'customer@gmail.com',
+            'password' => Hash::make('password'),
             'role' => 'customer',
             'phone' => '+6281234567892'
         ]);
