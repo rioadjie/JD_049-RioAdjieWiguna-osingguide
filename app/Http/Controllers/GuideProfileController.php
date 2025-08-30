@@ -17,6 +17,9 @@ class GuideProfileController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'name' => 'required|string|max:255',
+            'country_code' => 'required|string',
+            'phone_number' => 'required|numeric|min:8',
             'bio' => 'nullable|string',
             'experience' => 'nullable|string',
             'languages' => 'required|array',
@@ -29,8 +32,17 @@ class GuideProfileController extends Controller
         $guide = auth()->user();
         $profile = $guide->guideProfile ?? $guide->guideProfile()->make();
 
-        // Ambil data form, kecuali foto
-        $data = $request->except('photo');
+        // Combine country code and phone number
+        $phone = $request->country_code . $request->phone_number;
+
+        // Update data user (nama dan telepon)
+        $guide->update([
+            'name' => $request->name,
+            'phone' => $phone,
+        ]);
+
+        // Ambil data form untuk profile, kecuali foto dan data user
+        $profileData = $request->except(['photo', 'name', 'phone']);
 
         // Handle upload foto
         if ($request->hasFile('photo')) {
@@ -40,14 +52,35 @@ class GuideProfileController extends Controller
             }
 
             // Simpan foto baru
-            $data['photo'] = $request->file('photo')->store('guide_photos', 'public');
+            $profileData['photo'] = $request->file('photo')->store('guide_photos', 'public');
         }
 
-        // Simpan data
-        $profile->fill($data);
+        // Simpan data profile
+        $profile->fill($profileData);
         $profile->status = 'active'; // selalu aktif saat update profil
         $guide->guideProfile()->save($profile);
 
         return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'new_password' => 'required|string|min:8|confirmed',
+            'new_password_confirmation' => 'required',
+        ], [
+            'current_password.current_password' => 'Password saat ini tidak sesuai.',
+            'new_password.min' => 'Password baru minimal 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password tidak sesuai.',
+        ]);
+
+        $user->update([
+            'password' => bcrypt($request->new_password),
+        ]);
+
+        return back()->with('success', 'Password berhasil diperbarui!');
     }
 }

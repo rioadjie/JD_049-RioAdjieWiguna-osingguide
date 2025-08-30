@@ -61,6 +61,7 @@ Route::prefix('guide')->name('guide.')->middleware(['auth', 'verified', 'role:gu
     Route::post('/bookings/{id}complete', [GuideController::class, 'markAsCompleted'])->name('booking.complete');
     Route::get('/profile/edit', [GuideProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [GuideProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update-password', [GuideProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     Route::get('/availability', [GuideAvailabilityController::class, 'index'])->name('availability');
     Route::post('/availability', [GuideAvailabilityController::class, 'store'])->name('availability.store');
     Route::post('/availability/bulk', [GuideAvailabilityController::class, 'storeBulk'])->name('availability.bulk');
