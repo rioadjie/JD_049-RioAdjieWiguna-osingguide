@@ -149,8 +149,8 @@ graph TD
     H --> X[Commission Settings]
     
     P --> Y[Booking History]
-    S --> Z[Update Booking Status]
     W --> AA[Monitor Bookings]
+    AA --> Z[Update Booking Status]
 ```
 
 ### 🎯 Alur Pengguna (User Flow)
