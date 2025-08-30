@@ -2,10 +2,17 @@
 
 use App\Http\Controllers\AboutUsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\GuideAvailabilityController;
+use App\Http\Controllers\GuideController;
+use App\Http\Controllers\GuideProfileController;
+use App\Http\Controllers\GuideReviewController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 
 // Landing Page
 Route::get('/', [LandingPageController::class, 'index'])->name('landing-page');
+Route::get('/list-guides', [CustomerController::class, 'guides'])->name('customer.list-guides');
 
 // Admin Dashboard
 Route::prefix('admin')->name('admin.')->middleware('auth', 'role:admin')->group(function () {
@@ -51,6 +59,30 @@ Route::prefix('admin')->name('admin.')->middleware('auth', 'role:admin')->group(
     Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
     Route::get('/contact/edit', [ContactController::class, 'edit'])->name('contact.edit');
     Route::put('/contact/update/{id}', [ContactController::class, 'update'])->name('contact.update');
+});
+
+// Guide Dashboard
+Route::prefix('guide')->name('guide.')->middleware(['auth', 'role:guide'])->group(function () {
+    Route::get('/dashboard', [GuideController::class, 'dashboard'])->name('dashboard');
+    Route::get('/bookings', [GuideController::class, 'bookings'])->name('bookings');
+    Route::post('/bookings/{id}complete', [GuideController::class, 'markAsCompleted'])->name('booking.complete');
+    Route::get('/profile/edit', [GuideProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [GuideProfileController::class, 'update'])->name('profile.update');
+    Route::get('/availability', [GuideAvailabilityController::class, 'index'])->name('availability');
+    Route::post('/availability', [GuideAvailabilityController::class, 'store'])->name('availability.store');
+    Route::post('/availability/bulk', [GuideAvailabilityController::class, 'storeBulk'])->name('availability.bulk');
+    Route::delete('/availability/{id}', [GuideAvailabilityController::class, 'destroy'])->name('availability.destroy');
+    Route::get('/reviews', [GuideReviewController::class, 'index'])->name('reviews');
+});
+
+// Customer
+Route::prefix('customer')->name('customer.')->middleware(['auth', 'role:customer'])->group(function () {
+    Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/bookings', [BookingController::class, 'bookings'])->name('bookings');
+    Route::get('/bookings/create/{guideId}', [BookingController::class, 'create'])->name('booking.create');
+    Route::post('/bookings', [BookingController::class, 'store'])->name('booking.store');
+    Route::get('/reviews/create/{bookingId}', [ReviewController::class, 'create'])->name('review.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('review.store');
 });
 
 require __DIR__ . '/auth.php';

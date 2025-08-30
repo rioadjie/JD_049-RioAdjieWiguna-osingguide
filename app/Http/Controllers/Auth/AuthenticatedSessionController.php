@@ -38,8 +38,8 @@ class AuthenticatedSessionController extends Controller
 
         return match ($role) {
             'admin' => '/admin/dashboard',
-            'guide' => '/home',
-            'customer' => '/home',
+            'guide' => '/guide/dashboard',
+            'customer' => '/customer/dashboard',
             default => '/',
         };
     }

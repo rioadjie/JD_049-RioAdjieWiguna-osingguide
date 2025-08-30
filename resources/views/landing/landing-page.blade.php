@@ -190,7 +190,7 @@
                     <div class="btn-group">
                         <button class="btn btn-primary">Learn more</button>
 
-                        <a href="#" class="btn btn-secondary">Book Now</a>
+                        <a href="{{ route('customer.list-guides') }}" class="btn btn-secondary">Book Now</a>
                     </div>
 
                 </div>
@@ -202,7 +202,7 @@
 
             <section class="tour-search">
                 <div class="container">
-                    <form action="#" method="GET" class="tour-search-form">
+                    <form action="{{ route('customer.list-guides') }}" method="GET" class="tour-search-form">
 
                         <div class="input-wrapper">
                             <label for="level" class="input-label">Level Guides*</label>
@@ -386,7 +386,7 @@
                         @endforeach
                     </ul>
 
-                    <a href="#">
+                    <a href="{{ route('customer.list-guides') }}">
                         <button class="btn btn-primary">View All Guide</button>
                     </a>
 
