@@ -39,6 +39,20 @@
             flex: 1;
             /* Biar bagian utama ngambil sisa tinggi layar */
         }
+
+        .profile-avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-right: 8px;
+        }
     </style>
 </head>
 
@@ -86,12 +100,14 @@
                     @auth
                     <div class="profile-dropdown">
                         <button class="profile-btn">
-                            <img src="{{ asset('assets/img/team-1.jpg') }}" alt="Avatar">
+                            <div class="profile-avatar-small">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1) . substr(strrchr(Auth::user()->name, ' '), 1, 1)) }}
+                            </div>
                             <span class="text-primary">{{ Auth::user()->name }}</span>
                             <i class="arrow-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="#">My Profile</a>
+                            <a href="{{ route('customer.profile') }}">My Profile</a>
                             <a href="{{ route('customer.bookings') }}">Booking History</a>
                             <hr>
                             <form action="{{ route('logout') }}" method="POST">

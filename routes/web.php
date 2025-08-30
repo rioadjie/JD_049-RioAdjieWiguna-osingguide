@@ -71,6 +71,9 @@ Route::prefix('guide')->name('guide.')->middleware(['auth', 'verified', 'role:gu
 // Customer
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [CustomerController::class, 'profile'])->middleware(['auth', 'role:customer'])->name('profile');
+    Route::post('/profile/update', [CustomerController::class, 'updateProfile'])->middleware(['auth', 'role:customer'])->name('profile.update');
+    Route::post('/profile/update-password', [CustomerController::class, 'updatePassword'])->middleware(['auth', 'role:customer'])->name('profile.updatePassword');
     Route::get('/detail/{id}', [CustomerController::class, 'show'])->name('show');
     Route::get('/bookings', [BookingController::class, 'bookings'])->name('bookings');
     Route::get('/bookings/create/{guideId}', [BookingController::class, 'create'])->middleware(['auth', 'role:customer'])->name('booking.create');

@@ -150,4 +150,52 @@ class CustomerController extends Controller
 
         return view('landing.detail-place', compact('place'));
     }
+
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('landing.customer-profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'country_code' => 'required|string',
+            'phone_number' => 'required|numeric|min:8',
+        ]);
+
+        // Combine country code and phone number
+        $phone = $request->country_code . $request->phone_number;
+
+        $user->update([
+            'name' => $request->name,
+            'phone' => $phone,
+        ]);
+
+        return back()->with('success', 'Profile berhasil diperbarui!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'new_password' => 'required|string|min:8|confirmed',
+            'new_password_confirmation' => 'required',
+        ], [
+            'current_password.current_password' => 'Password saat ini tidak sesuai.',
+            'new_password.min' => 'Password baru minimal 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password tidak sesuai.',
+        ]);
+
+        $user->update([
+            'password' => bcrypt($request->new_password),
+        ]);
+
+        return back()->with('success', 'Password berhasil diperbarui!');
+    }
 }
