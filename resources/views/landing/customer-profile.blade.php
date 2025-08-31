@@ -479,9 +479,6 @@
                                     <div class="password-field">
                                         <input class="form-control @error('current_password') is-invalid @enderror"
                                                name="current_password" type="password" id="current_password" required>
-                                        <button type="button" class="password-toggle" onclick="togglePassword('current_password')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
                                     </div>
                                     @error('current_password')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -493,9 +490,6 @@
                                     <div class="password-field">
                                         <input class="form-control @error('new_password') is-invalid @enderror"
                                                name="new_password" type="password" id="new_password" required>
-                                        <button type="button" class="password-toggle" onclick="togglePassword('new_password')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
                                     </div>
                                     @error('new_password')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -507,9 +501,6 @@
                                     <div class="password-field">
                                         <input class="form-control @error('new_password_confirmation') is-invalid @enderror"
                                                name="new_password_confirmation" type="password" id="new_password_confirmation" required>
-                                        <button type="button" class="password-toggle" onclick="togglePassword('new_password_confirmation')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
                                     </div>
                                     @error('new_password_confirmation')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -620,23 +611,6 @@
                 }, 5000);
             });
         });
-
-        // Toggle password visibility
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const button = input.nextElementSibling;
-            const icon = button.querySelector('i');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
     </script>
 </body>
 
