@@ -26,6 +26,10 @@ Route::get('/list-gallery', [CustomerController::class, 'gallery'])->name('custo
 // Admin Dashboard
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    // Admin Profile
+    Route::get('/profile/edit', [AdminController::class, 'editProfile'])->name('profile.edit');
+    Route::post('/profile/update', [AdminController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/update-password', [AdminController::class, 'updatePassword'])->name('profile.updatePassword');
     // Booking Order
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::post('/bookings/{id}/status', [AdminController::class, 'updateBookingStatus'])->name('booking.status');

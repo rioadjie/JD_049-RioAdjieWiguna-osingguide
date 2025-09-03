@@ -18,7 +18,9 @@ class CustomerController extends Controller
         $places = Place::latest()->take(3)->get();
         // Ambil 3 guide populer
         $guides = User::where('role', 'guide')
-            ->whereHas('guideProfile') // hanya ambil yang punya profile
+            ->whereHas('guideProfile', function($q) {
+                $q->where('status', 'active');
+            }) // hanya ambil yang punya profile dan aktif
             ->with('guideProfile') // biar sekaligus load data profil\
             ->take(3)
             ->get();
@@ -34,7 +36,10 @@ class CustomerController extends Controller
 
     public function guides(Request $request)
     {
-        $query = User::where('role', 'guide')->whereHas('guideProfile');
+        $query = User::where('role', 'guide')
+            ->whereHas('guideProfile', function($q) {
+                $q->where('status', 'active');
+            });
 
         // Filter level (junior/intermediate/profesional)
         if ($request->level) {
@@ -99,7 +104,11 @@ class CustomerController extends Controller
     // Function untuk melihat detail guide
     public function show($id)
     {
-        $guide = User::with(['guideProfile', 'availabilities']) // kalau pakai spatie role
+        $guide = User::where('role', 'guide')
+            ->whereHas('guideProfile', function($q) {
+                $q->where('status', 'active');
+            })
+            ->with(['guideProfile', 'availabilities'])
             ->findOrFail($id);
 
         return view('landing.detail-guide', compact('guide'));

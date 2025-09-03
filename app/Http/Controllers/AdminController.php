@@ -156,4 +156,44 @@ class AdminController extends Controller
         }])->withCount('bookingsAsCustomer')->firstOrFail();
         return view('admin.customers.detail', compact('customer'));
     }
+
+    public function editProfile()
+    {
+        $admin = auth()->user();
+        return view('admin.profile.edit', compact('admin'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $admin = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $admin->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $admin->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ]);
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $admin = auth()->user();
+        $admin->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return back()->with('success', 'Password berhasil diperbarui!');
+    }
 }

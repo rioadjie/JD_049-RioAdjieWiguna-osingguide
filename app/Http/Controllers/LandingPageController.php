@@ -17,7 +17,9 @@ class LandingPageController extends Controller
         $places = Place::latest()->take(3)->get();
         // Ambil 3 guide populer
         $guides = User::where('role', 'guide')
-            ->whereHas('guideProfile') // hanya ambil yang punya profile
+            ->whereHas('guideProfile', function($q) {
+                $q->where('status', 'active');
+            }) // hanya ambil yang punya profile dan aktif
             ->with('guideProfile') // biar sekaligus load data profil\
             ->take(3)
             ->get();

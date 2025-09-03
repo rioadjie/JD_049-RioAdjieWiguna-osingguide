@@ -23,7 +23,13 @@ class BookingController extends Controller
 
     public function create($guideId)
     {
-        $guide = User::findOrFail($guideId);
+        $guide = User::where('role', 'guide')
+            ->whereHas('guideProfile', function($q) {
+                $q->where('status', 'active');
+            })
+            ->with('guideProfile')
+            ->findOrFail($guideId);
+
         return view('landing.booking', compact('guide'));
     }
 
@@ -58,7 +64,12 @@ class BookingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $guide = User::findOrFail($request->guide_id);
+        $guide = User::where('role', 'guide')
+            ->whereHas('guideProfile', function($q) {
+                $q->where('status', 'active');
+            })
+            ->with('guideProfile')
+            ->findOrFail($request->guide_id);
         $profile = $guide->guideProfile;
 
         // Cek kapasitas
