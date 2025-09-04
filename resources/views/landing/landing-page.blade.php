@@ -379,10 +379,10 @@
                                 <div class="card-price">
 
                                     <div class="wrapper">
-                                        <p class="reviews">({{ $guide->reviews_count }} reviews)</p>
+                                        <p class="reviews">({{ $guide->totalReviews }} reviews)</p>
 
                                         <div class="card-rating">
-                                            <span class="rating-text">{{ number_format($guide->guideProfile->rating ?? 0, 1) }}/5</span>
+                                            <span class="rating-text">{{ number_format($guide->avgRating, 1) }}/5</span>
                                             <ion-icon name="star"></ion-icon>
                                         </div>
                                     </div>
@@ -398,8 +398,8 @@
                                         <span>/ per day</span>
                                     </p>
 
-                                    <a href="{{ route('customer.booking.create', $guide->id) }}">
-                                        <button class="btn btn-secondary">Book Now</button>
+                                    <a href="{{ route('customer.show', $guide->id) }}">
+                                        <button class="btn btn-secondary">Detail Guide</button>
                                     </a>
 
                                 </div>

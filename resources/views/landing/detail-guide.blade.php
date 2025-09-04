@@ -167,6 +167,139 @@
             text-transform: uppercase;
         }
 
+        /* === REVIEWS SECTION === */
+        .reviews-summary {
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .rating-number {
+            color: #f5c518;
+            font-size: 1.3rem;
+        }
+
+        .rating-text {
+            color: #666;
+        }
+
+        .total-reviews {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .review-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 4px solid #2a7f46;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .reviewer-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .reviewer-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            color: #333;
+        }
+
+        .review-rating {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .review-rating .star-icon {
+            font-size: 0.9rem;
+        }
+
+        .review-rating .star-icon.filled {
+            color: #f5c518;
+        }
+
+        .review-rating .star-icon.empty {
+            color: #ddd;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .review-comment {
+            margin-top: 0.5rem;
+        }
+
+        .review-comment p {
+            margin: 0;
+            color: #555;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px dashed #ddd;
+        }
+
+        .view-all-reviews {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .view-all-reviews .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
         /* === RESPONSIVE === */
         @media (max-width: 768px) {
             .detail-wrapper {
@@ -240,7 +373,9 @@
                             <!-- Rating -->
                             <div class="rating">
                                 <ion-icon name="star" class="star-icon"></ion-icon>
-                                <span>{{ number_format($guide->guideProfile->rating ?? 0, 1) }}/5</span>
+                                <span class="rating-number">{{ number_format($avgRating, 1) }}</span>
+                                <span class="rating-text">/ 5</span>
+                                <span class="total-reviews">({{ $totalReviews }} reviews)</span>
                             </div>
 
                             <!-- Harga -->
@@ -302,9 +437,60 @@
                         </div>
                     </div>
 
+                    <!-- Reviews -->
+                    <div class="detail-section">
+                        <h4 class="h4">Customer Reviews</h4>
+                        <div class="reviews-summary">
+                            <div class="rating-display">
+                                <ion-icon name="star" class="star-icon"></ion-icon>
+                                <span class="rating-number">{{ number_format($avgRating, 1) }}</span>
+                                <span class="rating-text">/ 5</span>
+                                <span class="total-reviews">({{ $totalReviews }} reviews)</span>
+                            </div>
+                        </div>
+
+                        <div class="reviews-list">
+                            @forelse($guide->reviewsReceived->take(5) as $review)
+                                <div class="review-item">
+                                    <div class="review-header">
+                                        <div class="reviewer-info">
+                                            <div class="reviewer-avatar">
+                                                {{ strtoupper(substr($review->customer->name, 0, 1) . substr(strrchr($review->customer->name, ' '), 1, 1)) }}
+                                            </div>
+                                            <div class="reviewer-details">
+                                                <h5 class="reviewer-name">{{ $review->customer->name }}</h5>
+                                                <div class="review-rating">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <ion-icon name="star" class="star-icon {{ $i <= $review->rating ? 'filled' : 'empty' }}"></ion-icon>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="review-date">
+                                            {{ $review->created_at->format('d M Y') }}
+                                        </div>
+                                    </div>
+                                    @if($review->comment)
+                                        <div class="review-comment">
+                                            <p>"{{ $review->comment }}"</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @empty
+                                <div class="no-reviews">
+                                    <p>Belum ada ulasan untuk guide ini.</p>
+                                </div>
+                            @endforelse
+                        </div>
+
+                        @if($totalReviews > 5)
+                            <div class="view-all-reviews">
+                                <a href="#" class="btn btn-outline-primary">Lihat Semua Ulasan ({{ $totalReviews }})</a>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </section>
-
 
             <!-- CTA -->
             <section class="cta" id="contact">

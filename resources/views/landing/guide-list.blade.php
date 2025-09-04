@@ -16,6 +16,10 @@
     - custom css link
   -->
     <link rel="stylesheet" href="{{ asset('assets/css/landing-page.css') }}">
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
@@ -27,6 +31,67 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+    <style>
+        .profile-avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-right: 8px;
+        }
+
+        /* Date Range Picker Styles */
+        .date-range input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .date-range input[type="text"]:focus {
+            outline: none;
+            border-color: #2a7f46;
+            box-shadow: 0 0 0 2px rgba(42, 127, 70, 0.1);
+        }
+
+        .date-range input[type="text"]:hover {
+            border-color: #2a7f46;
+        }
+
+        .flatpickr-calendar {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .flatpickr-day.selected {
+            background: #2a7f46 !important;
+            border-color: #2a7f46 !important;
+        }
+
+        .flatpickr-day.selected.startRange {
+            background: #2a7f46 !important;
+            border-color: #2a7f46 !important;
+        }
+
+        .flatpickr-day.selected.endRange {
+            background: #2a7f46 !important;
+            border-color: #2a7f46 !important;
+        }
+
+        .flatpickr-day.inRange {
+            background: rgba(42, 127, 70, 0.1) !important;
+            border-color: rgba(42, 127, 70, 0.2) !important;
+        }
+    </style>
 </head>
 
 <body id="top">
@@ -152,7 +217,9 @@
                     @auth
                     <div class="profile-dropdown">
                         <button class="profile-btn">
-                            <img src="{{ asset('assets/img/team-1.jpg') }}" alt="Avatar">
+                            <div class="profile-avatar-small">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1) . substr(strrchr(Auth::user()->name, ' '), 1, 1)) }}
+                            </div>
                             <span class="profile-name">{{ Auth::user()->name }}</span>
                             <i class="arrow-down"></i>
                         </button>
@@ -238,13 +305,9 @@
                             <section>
                                 <h3>Availbility Guides</h3>
                                 <div class="date-range">
-                                    <label for="start-date">From</label>
-                                    <input type="date" id="start-date" value="{{ request('start_date') }}">
-
-                                    <label for="end-date">To</label>
-                                    <input type="date" id="end-date" value="{{ request('end_date') }}">
-
-                                    <button type="button" class="btn-apply-date" id="apply-date-btn">Apply Date</button>
+                                    <input type="text" id="date-range" placeholder="Select date range" readonly>
+                                    <input type="hidden" id="start-date" name="start_date" value="{{ request('start_date') }}">
+                                    <input type="hidden" id="end-date" name="end_date" value="{{ request('end_date') }}">
                                 </div>
                             </section>
 
@@ -294,9 +357,7 @@
 
                                     <div class="card-content">
                                         <div class="card-rating">
-                                            <span class="rating-text">{{ number_format($guide->guideProfile->rating ??
-                                                0, 1)
-                                                }}/5</span>
+                                            <span class="rating-text">{{ number_format($guide->avgRating, 1) }}/5</span>
                                             <ion-icon name="star"></ion-icon>
                                         </div>
                                         <p class="card-subtitle">{{ ucfirst($guide->guideProfile->level) }}</p>
@@ -464,6 +525,9 @@
     - custom js link
   -->
     <script src="{{ asset('assets/js/landing-page.js') }}"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <!-- Init Hero Swiper -->
@@ -501,25 +565,65 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Initialize Flatpickr Date Range Picker
+            const dateRangeInput = document.getElementById("date-range");
+            const startDateInput = document.getElementById("start-date");
+            const endDateInput = document.getElementById("end-date");
+
+            // Set initial values if they exist
+            let initialStartDate = startDateInput.value ? new Date(startDateInput.value) : null;
+            let initialEndDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+            const dateRangePicker = flatpickr(dateRangeInput, {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                startDate: initialStartDate,
+                endDate: initialEndDate,
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        // Reload page with date parameters
+                        const url = new URL(window.location);
+                        url.searchParams.set('start_date', selectedDates[0].toISOString().split('T')[0]);
+                        url.searchParams.set('end_date', selectedDates[1].toISOString().split('T')[0]);
+                        window.location.href = url.toString();
+                    } else if (selectedDates.length === 0) {
+                        // Clear date parameters and reload
+                        const url = new URL(window.location);
+                        url.searchParams.delete('start_date');
+                        url.searchParams.delete('end_date');
+                        window.location.href = url.toString();
+                    }
+                },
+                onClear: function() {
+                    // Clear date parameters and reload
+                    const url = new URL(window.location);
+                    url.searchParams.delete('start_date');
+                    url.searchParams.delete('end_date');
+                    window.location.href = url.toString();
+                }
+            });
+
+            // Set initial display value
+            if (initialStartDate && initialEndDate) {
+                dateRangeInput.value = `${initialStartDate.toLocaleDateString()} - ${initialEndDate.toLocaleDateString()}`;
+            }
+
             const cards = document.querySelectorAll(".popular-card");
             const filterBtns = document.querySelectorAll(".filter-btn");
             const priceSort = document.getElementById("price-sort");
-            const applyDateBtn = document.getElementById("apply-date-btn");
             const resetBtn = document.getElementById("reset-filters-btn");
 
             function applyFilters() {
                 const activeCategory = document.querySelector(".filter-btn.active")?.dataset.sort || "all";
                 const selectedLanguages = Array.from(document.querySelectorAll(".filter-language:checked")).map(el => el.value);
                 const selectedSkills = Array.from(document.querySelectorAll(".filter-skill:checked")).map(el => el.value);
-                const startDate = document.getElementById("start-date")?.value;
-                const endDate = document.getElementById("end-date")?.value;
 
                 cards.forEach(card => {
                     const category = card.dataset.category;
                     const price = parseInt(card.dataset.price);
                     const languages = card.dataset.language ? card.dataset.language.split(",") : [];
                     const skills = card.dataset.skill ? card.dataset.skill.split(",") : [];
-                    const availabilities = card.dataset.availability ? JSON.parse(card.dataset.availability) : [];
 
                     let visible = true;
 
@@ -536,19 +640,6 @@
                     if (selectedSkills.length) {
                         const matchSkill = selectedSkills.some(skill => skills.includes(skill));
                         if (!matchSkill) visible = false;
-                    }
-
-                    // Filter tanggal (availability)
-                    if (startDate || endDate) {
-                        let matchDate = false;
-                        if (availabilities.length) {
-                            matchDate = availabilities.some(date => {
-                                if (startDate && date < startDate) return false;
-                                if (endDate && date > endDate) return false;
-                                return true;
-                            });
-                        }
-                        if (!matchDate) visible = false;
                     }
 
                     card.style.display = visible ? "block" : "none";
@@ -578,28 +669,11 @@
 
             document.querySelectorAll(".filter-language, .filter-skill").forEach(el => el.addEventListener("change", applyFilters));
             priceSort.addEventListener("change", applyFilters);
-            applyDateBtn?.addEventListener("click", applyFilters);
 
             // Reset All Filters
             resetBtn?.addEventListener("click", () => {
-                // Reset kategori ke 'all'
-                filterBtns.forEach(btn => btn.classList.remove("active"));
-                const defaultBtn = document.querySelector(".filter-btn[data-sort='all']");
-                if (defaultBtn) defaultBtn.classList.add("active");
-
-                // Reset checkboxes
-                document.querySelectorAll(".filter-language, .filter-skill").forEach(el => el.checked = false);
-
-                // Reset tanggal
-                const startInput = document.getElementById("start-date");
-                const endInput = document.getElementById("end-date");
-                if (startInput) startInput.value = "";
-                if (endInput) endInput.value = "";
-
-                // Reset sort harga
-                if (priceSort) priceSort.value = "";
-
-                applyFilters();
+                // Reload page without any parameters
+                window.location.href = window.location.pathname;
             });
 
             applyFilters(); // apply default on load

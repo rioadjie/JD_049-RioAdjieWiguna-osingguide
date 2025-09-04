@@ -21,9 +21,16 @@ class CustomerController extends Controller
             ->whereHas('guideProfile', function($q) {
                 $q->where('status', 'active');
             }) // hanya ambil yang punya profile dan aktif
-            ->with('guideProfile') // biar sekaligus load data profil\
+            ->with(['guideProfile', 'reviewsReceived.customer']) // biar sekaligus load data profil dan reviews
             ->take(3)
             ->get();
+
+        // Calculate average ratings for each guide
+        foreach($guides as $guide) {
+            $guide->avgRating = $guide->reviewsReceived->avg('rating') ?? 0;
+            $guide->totalReviews = $guide->reviewsReceived->count();
+        }
+
         // Gallery
         $galleries = Gallery::latest()->take(5)->get();
         // About Us
@@ -96,7 +103,16 @@ class CustomerController extends Controller
             $query->orderBy('guideProfile->daily_rate', 'desc');
         }
 
-        $guides = $query->with('guideProfile')->get();
+        $guides = $query->with(['guideProfile', 'reviewsReceived.customer', 'availabilities'])->get();
+
+        // Calculate average ratings for each guide
+        foreach($guides as $guide) {
+            $guide->avgRating = $guide->reviewsReceived->avg('rating') ?? 0;
+            $guide->totalReviews = $guide->reviewsReceived->count();
+        }
+
+        // Sort guides by rating (highest first), then by creation date (oldest first)
+        $guides = $guides->sortByDesc('avgRating')->sortBy('created_at');
 
         return view('landing.guide-list', compact('guides'));
     }
@@ -108,10 +124,14 @@ class CustomerController extends Controller
             ->whereHas('guideProfile', function($q) {
                 $q->where('status', 'active');
             })
-            ->with(['guideProfile', 'availabilities'])
+            ->with(['guideProfile', 'availabilities', 'reviewsReceived.customer'])
             ->findOrFail($id);
 
-        return view('landing.detail-guide', compact('guide'));
+        // Get average rating and total reviews
+        $avgRating = $guide->reviewsReceived->avg('rating') ?? 0;
+        $totalReviews = $guide->reviewsReceived->count();
+
+        return view('landing.detail-guide', compact('guide', 'avgRating', 'totalReviews'));
     }
 
     public function places(Request $request)

@@ -20,9 +20,16 @@ class LandingPageController extends Controller
             ->whereHas('guideProfile', function($q) {
                 $q->where('status', 'active');
             }) // hanya ambil yang punya profile dan aktif
-            ->with('guideProfile') // biar sekaligus load data profil\
+            ->with(['guideProfile', 'reviewsReceived.customer']) // biar sekaligus load data profil dan reviews
             ->take(3)
             ->get();
+
+        // Calculate average ratings for each guide
+        foreach($guides as $guide) {
+            $guide->avgRating = $guide->reviewsReceived->avg('rating') ?? 0;
+            $guide->totalReviews = $guide->reviewsReceived->count();
+        }
+
         // Gallery
         $galleries = Gallery::latest()->take(5)->get();
         // About Us
