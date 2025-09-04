@@ -170,7 +170,21 @@
                                                     {{ ucfirst($booking->status) }}
                                                 </span>
                                             </td>
-                                            <td>Rp {{ number_format($booking->total_price, 0, ',', '.') }}</td>
+                                            <td>
+                                                @if($booking->promo_code)
+                                                    <div class="text-decoration-line-through text-secondary">
+                                                        Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                    </div>
+                                                    <div class="text-success">
+                                                        Rp {{ number_format($booking->final_amount, 0, ',', '.') }}
+                                                    </div>
+                                                    <small class="text-info">
+                                                        Promo: {{ $booking->promo_code }}
+                                                    </small>
+                                                @else
+                                                    Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($booking->status === 'completed' && !$booking->review)
                                                 <a href="{{ route('customer.review.create', $booking->id) }}" class="btn btn-sm btn-warning">Beri Ulasan</a>

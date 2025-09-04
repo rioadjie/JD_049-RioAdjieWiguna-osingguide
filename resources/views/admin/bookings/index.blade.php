@@ -66,14 +66,26 @@
                                         </td>
                                         <td>
                                             <span class="text-xs font-weight-bold">
-                                                Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                @if($booking->promo_code)
+                                                    <div class="text-decoration-line-through text-secondary">
+                                                        Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                    </div>
+                                                    <div class="text-success">
+                                                        Rp {{ number_format($booking->final_amount, 0, ',', '.') }}
+                                                    </div>
+                                                    <small class="text-info">
+                                                        Promo: {{ $booking->promo_code }}
+                                                    </small>
+                                                @else
+                                                    Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                @endif
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-gradient-{{ 
-                                                $booking->status == 'confirmed' ? 'success' : 
-                                                ($booking->status == 'pending' ? 'warning' : 
-                                                ($booking->status == 'cancelled' ? 'danger' : 
+                                            <span class="badge bg-gradient-{{
+                                                $booking->status == 'confirmed' ? 'success' :
+                                                ($booking->status == 'pending' ? 'warning' :
+                                                ($booking->status == 'cancelled' ? 'danger' :
                                                 ($booking->status == 'completed' ? 'info' : 'secondary')))
                                             }}">
                                                 {{ ucfirst($booking->status) }}

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutUsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CustomerController;
@@ -56,6 +57,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'role:ad
     Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
     Route::get('/contact/edit', [ContactController::class, 'edit'])->name('contact.edit');
     Route::put('/contact/update/{id}', [ContactController::class, 'update'])->name('contact.update');
+    // Promo Codes
+    Route::resource('promo-codes', PromoCodeController::class);
+    Route::post('/promo-codes/{promoCode}/toggle-status', [PromoCodeController::class, 'toggleStatus'])->name('promo-codes.toggle');
 });
 
 // Guide Dashboard
@@ -83,6 +87,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/bookings', [BookingController::class, 'bookings'])->name('bookings');
     Route::get('/bookings/create/{guideId}', [BookingController::class, 'create'])->middleware(['auth', 'role:customer'])->name('booking.create');
     Route::post('/bookings', [BookingController::class, 'store'])->middleware(['auth', 'role:customer'])->name('booking.store');
+    Route::post('/bookings/validate-promo', [BookingController::class, 'validatePromoCode'])->name('booking.validatePromo');
     Route::get('/reviews/create/{bookingId}', [ReviewController::class, 'create'])->middleware(['auth', 'role:customer'])->name('review.create');
     Route::post('/reviews', [ReviewController::class, 'store'])->middleware(['auth', 'role:customer'])->name('review.store');
 });

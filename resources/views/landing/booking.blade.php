@@ -308,6 +308,23 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <!-- Promo Code Section -->
+                            <div class="form-group mb-3">
+                                <label>Promo Code (Opsional)</label>
+                                <div class="input-group">
+                                    <input type="text" name="promo_code" id="promo-code" class="form-control @error('promo_code') is-invalid @enderror"
+                                           placeholder="Masukkan kode promo" maxlength="20">
+                                    <button type="button" class="btn btn-outline-primary" id="apply-promo">Apply</button>
+                                </div>
+                                <div id="promo-message" class="mt-2"></div>
+                                @error('promo_code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <input type="hidden" name="discount_amount" id="discount-amount" value="0">
+                            <input type="hidden" name="final_amount" id="final-amount" value="0">
                             <button type="submit" class="btn btn-primary">Booking Now</button>
                         </form>
                     </div>
@@ -324,9 +341,17 @@
                                 <span>Total Days:</span>
                                 <span id="total-days">0 days</span>
                             </div>
+                            <div class="price-row">
+                                <span>Sub Total:</span>
+                                <span id="sub-total">Rp 0</span>
+                            </div>
+                            <div class="price-row" id="discount-row" style="display: none;">
+                                <span>Discount:</span>
+                                <span id="discount-amount-display">-Rp 0</span>
+                            </div>
                             <div class="price-row total">
-                                <span>Total Price:</span>
-                                <span id="total-price">Rp 0</span>
+                                <span>Final Amount:</span>
+                                <span id="final-amount-display">Rp 0</span>
                             </div>
                         </div>
                     </div>
@@ -393,6 +418,8 @@
     <script>
         // Price calculation variables - using total daily rate that already includes platform fee
         const totalDailyRate = {{ $guide->guideProfile->daily_rate + (($guide->guideProfile->daily_rate * (\App\Models\Setting::getValue('platform_fee_value') ?? 15)) / 100) }};
+        let currentPromoCode = null;
+        let currentDiscountAmount = 0;
 
         // Function to calculate price
         function calculatePrice() {
@@ -419,16 +446,89 @@
 
                 if (totalDays > 0) {
                     const totalPrice = totalDailyRate * totalDays;
+                    const finalAmount = totalPrice - currentDiscountAmount;
 
                     // Update price summary
                     document.getElementById('daily-rate').textContent = 'Rp ' + totalDailyRate.toLocaleString('id-ID');
                     document.getElementById('total-days').textContent = totalDays + ' days';
-                    document.getElementById('total-price').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+                    document.getElementById('sub-total').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+                    document.getElementById('final-amount-display').textContent = 'Rp ' + finalAmount.toLocaleString('id-ID');
+
+                    // Update hidden inputs
+                    document.getElementById('discount-amount').value = currentDiscountAmount;
+                    document.getElementById('final-amount').value = finalAmount;
 
                     // Show price summary
                     document.getElementById('price-summary').style.display = 'block';
                 }
             }
+        }
+
+        // Function to validate promo code
+        function validatePromoCode() {
+            const promoCode = document.getElementById('promo-code').value.trim();
+            const messageDiv = document.getElementById('promo-message');
+
+            if (!promoCode) {
+                messageDiv.innerHTML = '';
+                currentPromoCode = null;
+                currentDiscountAmount = 0;
+                document.getElementById('discount-row').style.display = 'none';
+                calculatePrice();
+                return;
+            }
+
+            // Get current total amount for validation
+            const startTime = document.querySelector('input[name="start_time"]').value;
+            const endTime = document.querySelector('input[name="end_time"]').value;
+
+            if (!startTime || !endTime) {
+                messageDiv.innerHTML = '<div class="text-warning">Please select dates first to validate promo code.</div>';
+                return;
+            }
+
+            const start = new Date(startTime);
+            const end = new Date(endTime);
+            let totalDays;
+            if (start.toDateString() === end.toDateString()) {
+                totalDays = 1;
+            } else {
+                totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            }
+            const totalAmount = totalDailyRate * totalDays;
+
+            // Send AJAX request
+            fetch('{{ route("customer.booking.validatePromo") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify({
+                    code: promoCode,
+                    amount: totalAmount
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    messageDiv.innerHTML = '<div class="text-success">✓ ' + data.message + '</div>';
+                    currentPromoCode = data.data;
+                    currentDiscountAmount = data.data.discount_amount;
+                    document.getElementById('discount-row').style.display = 'flex';
+                    document.getElementById('discount-amount-display').textContent = '-Rp ' + currentDiscountAmount.toLocaleString('id-ID');
+                } else {
+                    messageDiv.innerHTML = '<div class="text-danger">✗ ' + data.message + '</div>';
+                    currentPromoCode = null;
+                    currentDiscountAmount = 0;
+                    document.getElementById('discount-row').style.display = 'none';
+                }
+                calculatePrice();
+            })
+            .catch(error => {
+                messageDiv.innerHTML = '<div class="text-danger">Error validating promo code. Please try again.</div>';
+                console.error('Error:', error);
+            });
         }
 
         // Function to validate dates
@@ -480,6 +580,8 @@
             const startTimeInput = document.querySelector('input[name="start_time"]');
             const endTimeInput = document.querySelector('input[name="end_time"]');
             const form = document.querySelector('form');
+            const applyPromoBtn = document.getElementById('apply-promo');
+            const promoCodeInput = document.getElementById('promo-code');
 
             // Set minimum date to current date and time
             const now = new Date();
@@ -500,6 +602,18 @@
             endTimeInput.addEventListener('change', function() {
                 validateDates();
                 calculatePrice();
+            });
+
+            // Promo code event listeners
+            applyPromoBtn.addEventListener('click', function() {
+                validatePromoCode();
+            });
+
+            promoCodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    validatePromoCode();
+                }
             });
 
             // Form submission validation

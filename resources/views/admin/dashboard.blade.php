@@ -114,6 +114,109 @@
             </div>
         </div>
 
+        <!-- Revenue Cards -->
+        <div class="row mt-4">
+            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Revenue</p>
+                                    <h5 class="font-weight-bolder">
+                                        Rp {{ number_format($bookings->sum('final_amount'), 0, ',', '.') }}
+                                    </h5>
+                                    <p class="mb-0">
+                                        <span class="text-success font-weight-bolder">Setelah diskon</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+                                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Discount</p>
+                                    <h5 class="font-weight-bolder text-info">
+                                        Rp {{ number_format($bookings->sum('discount_amount'), 0, ',', '.') }}
+                                    </h5>
+                                    <p class="mb-0">
+                                        <span class="text-info font-weight-bolder">Promo codes</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-info shadow-info text-center rounded-circle">
+                                    <i class="ni ni-tag text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Promo Used</p>
+                                    <h5 class="font-weight-bolder text-warning">
+                                        {{ $bookings->whereNotNull('promo_code')->count() }}
+                                    </h5>
+                                    <p class="mb-0">
+                                        <span class="text-warning font-weight-bolder">Bookings</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
+                                    <i class="ni ni-tag text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Avg Discount</p>
+                                    <h5 class="font-weight-bolder text-primary">
+                                        {{ $bookings->whereNotNull('promo_code')->count() > 0 ? number_format($bookings->whereNotNull('promo_code')->avg('discount_amount'), 0, ',', '.') : 0 }}
+                                    </h5>
+                                    <p class="mb-0">
+                                        <span class="text-primary font-weight-bolder">Per booking</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                                    <i class="ni ni-chart-bar-32 text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Daftar Booking Terbaru -->
         <div class="row mt-4">
             <div class="col-12">
@@ -156,12 +259,23 @@
                                             <span class="text-xs">{{ $booking->total_days }} hari</span>
                                         </td>
                                         <td>
-                                            <span class="text-xs font-weight-bold">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                                            <span class="text-xs font-weight-bold">
+                                                @if($booking->promo_code)
+                                                    <div class="text-decoration-line-through text-secondary">
+                                                        Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                    </div>
+                                                    <div class="text-success">
+                                                        Rp {{ number_format($booking->final_amount, 0, ',', '.') }}
+                                                    </div>
+                                                @else
+                                                    Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                @endif
+                                            </span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-gradient-{{ 
-                                                $booking->status == 'confirmed' ? 'success' : 
-                                                ($booking->status == 'pending' ? 'warning' : 
+                                            <span class="badge bg-gradient-{{
+                                                $booking->status == 'confirmed' ? 'success' :
+                                                ($booking->status == 'pending' ? 'warning' :
                                                 ($booking->status == 'cancelled' ? 'danger' : 'info'))
                                             }}">
                                                 {{ ucfirst($booking->status) }}

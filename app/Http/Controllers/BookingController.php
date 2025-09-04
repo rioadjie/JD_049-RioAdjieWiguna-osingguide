@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\GuideAvailability;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\PromoCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -62,6 +63,7 @@ class BookingController extends Controller
             'number_of_travelers' => 'required|integer|min:1',
             'destination' => 'required|string',
             'notes' => 'nullable|string',
+            'promo_code' => 'nullable|string|exists:promo_codes,code',
         ]);
 
         $guide = User::where('role', 'guide')
@@ -143,7 +145,24 @@ class BookingController extends Controller
             ? ($subTotal * $feeValue / 100)
             : $feeValue;
 
-        $totalPrice = $subTotal + $platformFee;
+        $totalAmount = $subTotal + $platformFee;
+
+        // Proses promo code
+        $promoCode = null;
+        $discountAmount = 0;
+        $finalAmount = $totalAmount;
+
+        if ($request->promo_code) {
+            $promoCode = PromoCode::where('code', strtoupper($request->promo_code))->first();
+
+            if ($promoCode && $promoCode->isValid()) {
+                $discountAmount = $promoCode->calculateDiscount($totalAmount);
+                $finalAmount = $totalAmount - $discountAmount;
+
+                // Increment usage count
+                $promoCode->incrementUsage();
+            }
+        }
 
         $booking = Booking::create([
             'customer_id' => auth()->id(),
@@ -160,7 +179,10 @@ class BookingController extends Controller
             'guide_daily_rate' => $profile->daily_rate,
             'sub_total' => $subTotal,
             'platform_fee' => $platformFee,
-            'total_price' => $totalPrice,
+            'total_price' => $totalAmount,
+            'promo_code' => $promoCode ? $promoCode->code : null,
+            'discount_amount' => $discountAmount,
+            'final_amount' => $finalAmount,
             'fee_type' => $feeType,
             'fee_value' => $feeValue,
         ]);
@@ -209,8 +231,13 @@ class BookingController extends Controller
         $message .= "• Durasi: {$booking->total_days} hari\n";
         $message .= "• Jumlah Wisatawan: {$booking->number_of_travelers}\n\n";
 
-        $message .= "💰 Total: Rp " . number_format($booking->total_price, 0, ',', '.') . "\n\n";
-        $message .= "📍 Tujuan: {$destination}\n\n";
+        $message .= "💰 Total: Rp " . number_format($booking->total_price, 0, ',', '.') . "\n";
+        if ($booking->promo_code) {
+            $message .= "🎫 Promo Code: {$booking->promo_code}\n";
+            $message .= "💸 Discount: Rp " . number_format($booking->discount_amount, 0, ',', '.') . "\n";
+            $message .= "💳 Final Amount: Rp " . number_format($booking->final_amount, 0, ',', '.') . "\n";
+        }
+        $message .= "\n📍 Tujuan: {$destination}\n\n";
         $message .= "📝 Catatan: {$notes}";
 
         // Kirim ke Telegram
@@ -237,5 +264,66 @@ class BookingController extends Controller
         curl_close($ch);
 
         return redirect('/customer/bookings')->with('success', 'Booking berhasil dibuat!');
+    }
+
+    public function validatePromoCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'amount' => 'required|numeric|min:0'
+        ]);
+
+        $promoCode = PromoCode::where('code', strtoupper($request->code))->first();
+
+        if (!$promoCode) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Promo code tidak ditemukan.'
+            ]);
+        }
+
+        if (!$promoCode->isValid()) {
+            $message = 'Promo code tidak valid.';
+
+            if ($promoCode->isExpired()) {
+                $message = 'Promo code sudah expired.';
+            } elseif ($promoCode->isNotStarted()) {
+                $message = 'Promo code belum aktif.';
+            } elseif ($promoCode->isUsageLimitReached()) {
+                $message = 'Promo code sudah mencapai batas penggunaan.';
+            } elseif (!$promoCode->is_active) {
+                $message = 'Promo code tidak aktif.';
+            }
+
+            return response()->json([
+                'valid' => false,
+                'message' => $message
+            ]);
+        }
+
+        if ($request->amount < $promoCode->minimum_amount) {
+            return response()->json([
+                'valid' => false,
+                'message' => "Minimum pembelian Rp" . number_format($promoCode->minimum_amount, 0, ',', '.')
+            ]);
+        }
+
+        $discountAmount = $promoCode->calculateDiscount($request->amount);
+        $finalAmount = $request->amount - $discountAmount;
+
+        return response()->json([
+            'valid' => true,
+            'message' => 'Promo code valid!',
+            'data' => [
+                'code' => $promoCode->code,
+                'name' => $promoCode->name,
+                'discount_type' => $promoCode->discount_type,
+                'discount_value' => $promoCode->discount_value,
+                'discount_amount' => $discountAmount,
+                'final_amount' => $finalAmount,
+                'minimum_amount' => $promoCode->minimum_amount,
+                'maximum_discount' => $promoCode->maximum_discount
+            ]
+        ]);
     }
 }

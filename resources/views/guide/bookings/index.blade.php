@@ -23,6 +23,7 @@
                                             <th>Tanggal</th>
                                             <th>Durasi</th>
                                             <th>Jumlah Orang</th>
+                                            <th>Total Harga</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -39,6 +40,21 @@
                                                 <td>{{ $booking->total_days }} hari</td>
                                                 <td>{{ $booking->number_of_travelers }} orang</td>
                                                 <td>
+                                                    @if($booking->promo_code)
+                                                        <div class="text-decoration-line-through text-secondary">
+                                                            Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                        </div>
+                                                        <div class="text-success">
+                                                            Rp {{ number_format($booking->final_amount, 0, ',', '.') }}
+                                                        </div>
+                                                        <small class="text-info">
+                                                            Promo: {{ $booking->promo_code }}
+                                                        </small>
+                                                    @else
+                                                        Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+                                                    @endif
+                                                </td>
+                                                <td>
                                                     <span
                                                         class="badge bg-gradient-{{ $booking->status == 'confirmed'
                                                             ? 'info'
@@ -52,7 +68,7 @@
                                                     @if($booking->status === 'ongoing')
                                                         <form action="{{ route('guide.booking.complete', $booking->id) }}" method="POST" class="mt-2">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-sm btn-success" 
+                                                            <button type="submit" class="btn btn-sm btn-success"
                                                                     onclick="return confirm('Apakah perjalanan ini sudah selesai?')">
                                                                 Tandai Selesai
                                                             </button>
@@ -62,7 +78,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="text-center text-muted">Belum ada pemesanan.</td>
+                                                <td colspan="7" class="text-center text-muted">Belum ada pemesanan.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>

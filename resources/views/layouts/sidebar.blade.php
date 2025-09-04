@@ -28,55 +28,78 @@
             <li class="nav-item mt-4">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Menu</h6>
             </li>
+            {{-- User Management --}}
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.bookings') ? 'active' : '' }}"
-                    href="{{ route('admin.bookings') }}">
+                <a class="nav-link {{ request()->routeIs('admin.profile*') || request()->routeIs('admin.guides*') || request()->routeIs('admin.customers*') ? 'active' : '' }}"
+                    data-bs-toggle="collapse" href="#userManagement" role="button"
+                    aria-expanded="{{ request()->routeIs('admin.profile*') || request()->routeIs('admin.guides*') || request()->routeIs('admin.customers*') ? 'true' : 'false' }}"
+                    aria-controls="userManagement">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-calendar-grid-58 text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Booking Orders</span>
+                    <span class="nav-link-text ms-1">User Management</span>
                 </a>
+                <div class="collapse {{ request()->routeIs('admin.profile*') || request()->routeIs('admin.guides*') || request()->routeIs('admin.customers*') ? 'show' : '' }}"
+                    id="userManagement">
+                    <ul class="nav flex-column ms-4">
+                        <li class="nav-item mt-2">
+                            <a class="nav-link {{ request()->routeIs('admin.profile*') ? 'active' : '' }}"
+                                href="{{ route('admin.profile.edit') }}">
+                                Admin Profile
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <a class="nav-link {{ request()->routeIs('admin.guides*') ? 'active' : '' }}"
+                                href="{{ route('admin.guides') }}">
+                                Guide Profile
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <a class="nav-link {{ request()->routeIs('admin.customers*') ? 'active' : '' }}"
+                                href="{{ route('admin.customers') }}">
+                                Customer Profile
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.guides') ? 'active' : '' }}"
-                    href="{{ route('admin.guides') }}">
+
+            {{-- Booking Management --}}
+            <li class="nav-item mt-2">
+                <a class="nav-link {{ request()->routeIs('admin.bookings*') || request()->routeIs('admin.settings.commission*') || request()->routeIs('admin.promo-codes*') ? 'active' : '' }}"
+                    data-bs-toggle="collapse" href="#bookingManagement" role="button"
+                    aria-expanded="{{ request()->routeIs('admin.bookings*') || request()->routeIs('admin.settings.commission*') || request()->routeIs('admin.promo-codes*') ? 'true' : 'false' }}"
+                    aria-controls="bookingManagement">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-credit-card text-dark text-sm opacity-10"></i>
+                        <i class="ni ni-calendar-grid-58 text-primary text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Guide Profile</span>
+                    <span class="nav-link-text ms-1">Booking Management</span>
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.customers') ? 'active' : '' }}"
-                    href="{{ route('admin.customers') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-app text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Customer Profile</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.settings.commission') ? 'active' : '' }}"
-                    href="{{ route('admin.settings.commission') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-world-2 text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Commission Settings</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.profile.edit') ? 'active' : '' }}"
-                    href="{{ route('admin.profile.edit') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Admin Profil</span>
-                </a>
+                <div class="collapse {{ request()->routeIs('admin.bookings*') || request()->routeIs('admin.settings.commission*') || request()->routeIs('admin.promo-codes*') ? 'show' : '' }}"
+                    id="bookingManagement">
+                    <ul class="nav flex-column ms-4">
+                        <li class="nav-item mt-2">
+                            <a class="nav-link {{ request()->routeIs('admin.bookings*') ? 'active' : '' }}"
+                                href="{{ route('admin.bookings') }}">
+                                Booking Orders
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <a class="nav-link {{ request()->routeIs('admin.settings.commission*') ? 'active' : '' }}"
+                                href="{{ route('admin.settings.commission') }}">
+                                Commission Settings
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <a class="nav-link {{ request()->routeIs('admin.promo-codes*') ? 'active' : '' }}"
+                                href="{{ route('admin.promo-codes.index') }}">
+                                Promo Codes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             {{-- Content Management --}}
             <li class="nav-item mt-2">

@@ -24,6 +24,9 @@ class Booking extends Model
         'sub_total',
         'platform_fee',
         'total_price',
+        'promo_code',
+        'discount_amount',
+        'final_amount',
         'fee_type',
         'fee_value',
     ];
