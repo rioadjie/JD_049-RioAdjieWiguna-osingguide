@@ -18,6 +18,10 @@
     <link rel="stylesheet" href="{{ asset('assets/css/landing-page.css') }}">
     <link id="pagestyle" href="{{ asset('assets/css/argon-dashboard.css')}}" rel="stylesheet" />
 
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_green.css">
+
     <!--
     - google font link
   -->
@@ -109,6 +113,62 @@
 
         .price-row span:last-child {
             font-weight: 500;
+        }
+
+        /* Date Range Picker Styles */
+        #date-range {
+            cursor: pointer;
+            background: #fff;
+        }
+
+        #date-range:focus {
+            border-color: hsl(172, 51%, 15%);
+            box-shadow: 0 0 0 0.2rem rgba(172, 51%, 15%, 0.25);
+        }
+
+        .flatpickr-calendar {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .flatpickr-day.selected {
+            background: hsl(172, 51%, 15%) !important;
+            border-color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-day.selected.startRange {
+            background: hsl(172, 51%, 15%) !important;
+            border-color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-day.selected.endRange {
+            background: hsl(172, 51%, 15%) !important;
+            border-color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-day.inRange {
+            background: hsla(172, 51%, 15%, 0.1) !important;
+            border-color: hsla(172, 51%, 15%, 0.2) !important;
+        }
+
+        .flatpickr-current-month {
+            color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-monthDropdown-months {
+            color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-weekday {
+            color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-day:hover {
+            background: hsla(172, 51%, 15%, 0.1) !important;
+        }
+
+        .flatpickr-time input:hover,
+        .flatpickr-time input:focus {
+            background: hsla(172, 51%, 15%, 0.1) !important;
         }
     </style>
 </head>
@@ -275,37 +335,34 @@
                             <input type="hidden" name="guide_id" value="{{ $guide->id }}">
 
                             <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label>Start Date</label>
-                                    <input type="datetime-local" name="start_time" class="form-control @error('start_time') is-invalid @enderror"
-                                           min="{{ date('Y-m-d\TH:i') }}" required>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label>End Date</label>
-                                    <input type="datetime-local" name="end_time" class="form-control @error('end_time') is-invalid @enderror"
-                                           min="{{ date('Y-m-d\TH:i') }}" required>
+                                <div class="form-group col-md-12">
+                                    <label>Date and Time Trip</label>
+                                    <input type="text" id="date-range" placeholder="Select date and time range" readonly class="form-control @error('start_time') is-invalid @enderror" required>
+                                    <input type="hidden" name="start_time" id="start-time">
+                                    <input type="hidden" name="end_time" id="end-time">
                                 </div>
                             </div>
                             <div class="form-group mb-3">
                                 <label>Number of Participants</label>
-                                <input type="number" name="number_of_travelers" class="form-control @error('number_of_travelers') is-invalid @enderror"
-                                       min="1" max="{{ $guide->guideProfile->max_travelers }}" required>
+                                <input type="number" name="number_of_travelers"
+                                    class="form-control @error('number_of_travelers') is-invalid @enderror" min="1"
+                                    max="{{ $guide->guideProfile->max_travelers }}" required>
                                 @error('number_of_travelers')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="form-group mb-3">
                                 <label>Travel Destination</label>
                                 <input type="text" name="destination" class="form-control @error('destination') is-invalid @enderror" required>
                                 @error('destination')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="form-group mb-3">
                                 <label>Notes (Opsional)</label>
                                 <textarea name="notes" class="form-control @error('notes') is-invalid @enderror"></textarea>
                                 @error('notes')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -313,47 +370,48 @@
                             <div class="form-group mb-3">
                                 <label>Promo Code (Opsional)</label>
                                 <div class="input-group">
-                                    <input type="text" name="promo_code" id="promo-code" class="form-control @error('promo_code') is-invalid @enderror"
-                                           placeholder="Masukkan kode promo" maxlength="20">
-                                    <button type="button" class="btn btn-outline-primary" id="apply-promo">Apply</button>
+                                    <input type="text" name="promo_code" id="promo-code"
+                                        class="form-control @error('promo_code') is-invalid @enderror" placeholder="Masukkan kode promo"
+                                        maxlength="20" aria-describedby="button-addon2">
+                                    <button type="button" class="btn btn-outline-primary mb-0" id="apply-promo" id="button-addon2">Apply</button>
                                 </div>
                                 <div id="promo-message" class="mt-2"></div>
                                 @error('promo_code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <!-- Price Summary -->
+                            <div class="price-summary mb-3" id="price-summary" style="display: none;">
+                                <h3>Price Summary</h3>
+                                <div class="price-details">
+                                    <div class="price-row">
+                                        <span>Guide Daily Rate:</span>
+                                        <span id="daily-rate">Rp 0</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span>Total Days:</span>
+                                        <span id="total-days">0 days</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span>Sub Total:</span>
+                                        <span id="sub-total">Rp 0</span>
+                                    </div>
+                                    <div class="price-row" id="discount-row" style="display: none;">
+                                        <span>Discount:</span>
+                                        <span id="discount-amount-display">-Rp 0</span>
+                                    </div>
+                                    <div class="price-row total">
+                                        <span>Final Amount:</span>
+                                        <span id="final-amount-display">Rp 0</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <input type="hidden" name="discount_amount" id="discount-amount" value="0">
                             <input type="hidden" name="final_amount" id="final-amount" value="0">
-                            <button type="submit" class="btn btn-primary">Booking Now</button>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Booking Now</button>
                         </form>
-                    </div>
-
-                    <!-- Price Summary -->
-                    <div class="price-summary" id="price-summary" style="display: none;">
-                        <h3>Price Summary</h3>
-                        <div class="price-details">
-                            <div class="price-row">
-                                <span>Guide Daily Rate:</span>
-                                <span id="daily-rate">Rp 0</span>
-                            </div>
-                            <div class="price-row">
-                                <span>Total Days:</span>
-                                <span id="total-days">0 days</span>
-                            </div>
-                            <div class="price-row">
-                                <span>Sub Total:</span>
-                                <span id="sub-total">Rp 0</span>
-                            </div>
-                            <div class="price-row" id="discount-row" style="display: none;">
-                                <span>Discount:</span>
-                                <span id="discount-amount-display">-Rp 0</span>
-                            </div>
-                            <div class="price-row total">
-                                <span>Final Amount:</span>
-                                <span id="final-amount-display">Rp 0</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -406,6 +464,9 @@
     - custom js link
   -->
     <script src="{{ asset('assets/js/landing-page.js') }}"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <!--
     - ionicon link
@@ -533,8 +594,8 @@
 
         // Function to validate dates
         function validateDates() {
-            const startTimeInput = document.querySelector('input[name="start_time"]');
-            const endTimeInput = document.querySelector('input[name="end_time"]');
+            const startTimeInput = document.getElementById('start-time');
+            const endTimeInput = document.getElementById('end-time');
             const startTime = startTimeInput.value;
             const endTime = endTimeInput.value;
 
@@ -577,32 +638,37 @@
 
         // Add event listeners to form inputs
         document.addEventListener('DOMContentLoaded', function() {
-            const startTimeInput = document.querySelector('input[name="start_time"]');
-            const endTimeInput = document.querySelector('input[name="end_time"]');
-            const form = document.querySelector('form');
-            const applyPromoBtn = document.getElementById('apply-promo');
-            const promoCodeInput = document.getElementById('promo-code');
+            // Initialize Flatpickr Date Range Picker
+            const dateRangeInput = document.getElementById("date-range");
+            const startTimeInput = document.getElementById("start-time");
+            const endTimeInput = document.getElementById("end-time");
 
-            // Set minimum date to current date and time
-            const now = new Date();
-            const nowString = now.toISOString().slice(0, 16);
-            startTimeInput.min = nowString;
-            endTimeInput.min = nowString;
-
-            startTimeInput.addEventListener('change', function() {
-                validateDates();
-                calculatePrice();
-
-                // Update end date minimum to start date
-                if (this.value) {
-                    endTimeInput.min = this.value;
+            const dateRangePicker = flatpickr(dateRangeInput, {
+                mode: "range",
+                dateFormat: "Y-m-d H:i",
+                enableTime: true,
+                time_24hr: true,
+                minDate: "today",
+                minTime: "00:00",
+                maxTime: "23:59",
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        startTimeInput.value = selectedDates[0].toISOString().slice(0, 16);
+                        endTimeInput.value = selectedDates[1].toISOString().slice(0, 16);
+                        validateDates();
+                        calculatePrice();
+                    }
+                },
+                onClear: function() {
+                    startTimeInput.value = "";
+                    endTimeInput.value = "";
+                    calculatePrice();
                 }
             });
 
-            endTimeInput.addEventListener('change', function() {
-                validateDates();
-                calculatePrice();
-            });
+            const form = document.querySelector('form');
+            const applyPromoBtn = document.getElementById('apply-promo');
+            const promoCodeInput = document.getElementById('promo-code');
 
             // Promo code event listeners
             applyPromoBtn.addEventListener('click', function() {

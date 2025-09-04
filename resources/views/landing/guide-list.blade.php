@@ -19,7 +19,7 @@
 
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_green.css">
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
@@ -73,23 +73,44 @@
         }
 
         .flatpickr-day.selected {
-            background: #2a7f46 !important;
-            border-color: #2a7f46 !important;
+            background: hsl(172, 51%, 15%) !important;
+            border-color: hsl(172, 51%, 15%) !important;
         }
 
         .flatpickr-day.selected.startRange {
-            background: #2a7f46 !important;
-            border-color: #2a7f46 !important;
+            background: hsl(172, 51%, 15%) !important;
+            border-color: hsl(172, 51%, 15%) !important;
         }
 
         .flatpickr-day.selected.endRange {
-            background: #2a7f46 !important;
-            border-color: #2a7f46 !important;
+            background: hsl(172, 51%, 15%) !important;
+            border-color: hsl(172, 51%, 15%) !important;
         }
 
         .flatpickr-day.inRange {
-            background: rgba(42, 127, 70, 0.1) !important;
-            border-color: rgba(42, 127, 70, 0.2) !important;
+            background: hsla(172, 51%, 15%, 0.1) !important;
+            border-color: hsla(172, 51%, 15%, 0.2) !important;
+        }
+
+        .flatpickr-current-month {
+            color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-monthDropdown-months {
+            color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-weekday {
+            color: hsl(172, 51%, 15%) !important;
+        }
+
+        .flatpickr-day:hover {
+            background: hsla(172, 51%, 15%, 0.1) !important;
+        }
+
+        .flatpickr-time input:hover,
+        .flatpickr-time input:focus {
+            background: hsla(172, 51%, 15%, 0.1) !important;
         }
     </style>
 </head>

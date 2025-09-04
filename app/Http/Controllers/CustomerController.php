@@ -124,7 +124,7 @@ class CustomerController extends Controller
             ->whereHas('guideProfile', function($q) {
                 $q->where('status', 'active');
             })
-            ->with(['guideProfile', 'availabilities', 'reviewsReceived.customer'])
+            ->with(['guideProfile', 'availabilities', 'reviewsReceived.customer', 'bookingsAsGuide'])
             ->findOrFail($id);
 
         // Get average rating and total reviews

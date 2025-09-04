@@ -429,7 +429,25 @@
                     <div class="detail-section">
                         <h4 class="h4">Availability</h4>
                         <div class="availability-list">
-                            @forelse($guide->availabilities->where("status","available") as $avail)
+                            @php
+                                // Filter availability dates that don't have active bookings
+                                $availableDates = $guide->availabilities->where("status","available")->filter(function($avail) use ($guide) {
+                                    // Check if there's any active booking on this date
+                                    $hasActiveBooking = $guide->bookingsAsGuide->where('status', '!=', 'cancelled')
+                                        ->where(function($booking) use ($avail) {
+                                            $bookingStart = $booking->start_time->format('Y-m-d');
+                                            $bookingEnd = $booking->end_time->format('Y-m-d');
+                                            $availDate = $avail->date->format('Y-m-d');
+
+                                            // Check if the availability date falls within any active booking period
+                                            return ($availDate >= $bookingStart && $availDate <= $bookingEnd);
+                                        })->count() > 0;
+
+                                    return !$hasActiveBooking;
+                                });
+                            @endphp
+
+                            @forelse($availableDates as $avail)
                                 <span class="avail-date">{{ $avail->date->format('d M Y') }}</span>
                             @empty
                                 <p>No available dates for this guide.</p>
